@@ -17,7 +17,6 @@ import { CachedCollectionManager } from '../../ui-cached-collection';
 import { hasRole } from '../../authorization';
 import { tooltip } from '../../ui/client/components/tooltip';
 import { callbacks } from '../../callbacks/client';
-import { isSyncReady } from '../../../client/lib/userData';
 
 function executeCustomScript(script) {
 	eval(script);//eslint-disable-line
@@ -176,9 +175,13 @@ Template.main.helpers({
 		return iframeEnabled && iframeLogin.reactiveIframeUrl.get();
 	},
 	subsReady() {
+		const userReady = Meteor.user();
+
 		const subscriptionsReady = CachedChatSubscription.ready.get();
+
 		const settingsReady = settings.cachedCollection.ready.get();
-		const ready = !Meteor.userId() || (isSyncReady.get() && subscriptionsReady && settingsReady);
+
+		const ready = (userReady && subscriptionsReady && settingsReady) || !Meteor.userId();
 
 		CachedCollectionManager.syncEnabled = ready;
 		mainReady.set(ready);
@@ -238,6 +241,10 @@ Template.main.events({
 
 Template.main.onRendered(function() {
 	$('#initial-page-loading').remove();
+
+	Meteor.defer(() => {
+		callbacks.run('afterMainReady', Meteor.user());
+	});
 
 	return Tracker.autorun(function() {
 		const userId = Meteor.userId();

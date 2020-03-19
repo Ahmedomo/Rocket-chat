@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { ReactiveVar } from 'meteor/reactive-var';
 import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
+import { Tracker } from 'meteor/tracker';
 
 import { SideNav, menu } from '../../ui-utils';
 import { settings } from '../../settings';
@@ -39,7 +40,7 @@ Template.sideNav.helpers({
 
 	sidebarViewMode() {
 		const viewMode = getUserPreference(Meteor.userId(), 'sidebarViewMode');
-		return viewMode || 'condensed';
+		return viewMode || 'extended';
 	},
 
 	sidebarHideAvatar() {
@@ -88,10 +89,25 @@ const redirectToDefaultChannelIfNeeded = () => {
 	}
 };
 
+const openMainContentIfNeeded = () => {
+	const currentRouteState = FlowRouter.current();
+	const defaults = ['/', '/home', '/account'];
+
+	if (defaults.includes(currentRouteState.path)) {
+		menu.open();
+	} else {
+		menu.close();
+	}
+};
+
 Template.sideNav.onRendered(function() {
 	SideNav.init();
 	menu.init();
 	redirectToDefaultChannelIfNeeded();
+	Tracker.autorun(function() {
+		FlowRouter.watchPathChange();
+		openMainContentIfNeeded();
+	});
 
 	return Meteor.defer(() => menu.updateUnreadBars());
 });

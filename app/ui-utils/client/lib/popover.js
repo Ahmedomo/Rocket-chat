@@ -5,6 +5,8 @@ import { FlowRouter } from 'meteor/kadira:flow-router';
 import { Template } from 'meteor/templating';
 import _ from 'underscore';
 
+import { t, getUserPreference, share, isShareAvailable } from '../../../utils';
+import { settings } from '../../../settings';
 import { hide, leave } from './ChannelActions';
 import { messageBox } from './messageBox';
 import { MessageAction } from './MessageAction';
@@ -34,6 +36,30 @@ export const popover = {
 			$(activeElement).removeClass('active');
 		}
 	},
+};
+
+
+const viewModeIcon = {
+	extended: 'th-list',
+	medium: 'list',
+	condensed: 'list-alt',
+};
+
+const extendedViewOption = (user) => {
+	if (settings.get('Store_Last_Message')) {
+		return {
+			icon: viewModeIcon.extended,
+			name: t('Extended'),
+			modifier: getUserPreference(user, 'sidebarViewMode') === 'extended' ? 'bold' : null,
+			action: () => {
+				Meteor.call('saveUserPreferences', { sidebarViewMode: 'extended' }, function(error) {
+					if (error) {
+						return handleError(error);
+					}
+				});
+			},
+		};
+	}
 };
 
 Template.popover.helpers({
@@ -175,6 +201,96 @@ Template.popover.events({
 			button.action.call(t.data.data, e, t.data.instance);
 			popover.close();
 			return false;
+		}
+	},
+	'click [data-type="sort-action"]'(e) {
+		popover.close();
+		const options = [];
+		const config = {
+			template: 'sortlist',
+			currentTarget: e.currentTarget,
+			data: {
+				options,
+			},
+			offsetVertical: e.currentTarget.clientHeight + 10,
+		};
+		popover.open(config);
+	},
+	'click [data-type="view-mode-action"]'(e) {
+		popover.close();
+		const user = Meteor.userId();
+		const hideAvatarSetting = getUserPreference(user, 'sidebarHideAvatar');
+		const config = {
+			columns: [
+				{
+					groups: [
+						{
+							items: [
+								extendedViewOption(user),
+								{
+									icon: viewModeIcon.medium,
+									name: t('Medium'),
+									modifier: getUserPreference(user, 'sidebarViewMode') === 'medium' ? 'bold' : null,
+									action: () => {
+										Meteor.call('saveUserPreferences', { sidebarViewMode: 'medium' }, function(error) {
+											if (error) {
+												return handleError(error);
+											}
+										});
+									},
+								},
+								{
+									icon: viewModeIcon.condensed,
+									name: t('Condensed'),
+									modifier: getUserPreference(user, 'sidebarViewMode') === 'condensed' ? 'bold' : null,
+									action: () => {
+										Meteor.call('saveUserPreferences', { sidebarViewMode: 'condensed' }, function(error) {
+											if (error) {
+												return handleError(error);
+											}
+										});
+									},
+								},
+							],
+						},
+						{
+							items: [
+								{
+									icon: 'user-rounded',
+									name: hideAvatarSetting ? t('Show_Avatars') : t('Hide_Avatars'),
+									action: () => {
+										Meteor.call('saveUserPreferences', { sidebarHideAvatar: !hideAvatarSetting }, function(error) {
+											if (error) {
+												return handleError(error);
+											}
+										});
+									},
+								},
+							],
+						},
+					],
+				},
+			],
+			currentTarget: e.currentTarget,
+			offsetVertical: e.currentTarget.clientHeight + 10,
+		};
+		popover.open(config);
+	},
+	'click [data-type="share-action"]'(e) {
+		if (isShareAvailable()) {
+			share();
+		} else {
+			popover.close();
+			const options = [];
+			const config = {
+				template: 'share',
+				currentTarget: e.target,
+				data: {
+					options,
+				},
+				offsetVertical: e.target.clientHeight + 10,
+			};
+			popover.open(config);
 		}
 	},
 	'click [data-type="sidebar-item"]'(e, instance) {
