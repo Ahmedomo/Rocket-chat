@@ -185,9 +185,6 @@ settings.get('Accounts_ForgetUserSessionOnWindowClose', (key, value) => {
 <script>
 	window.addEventListener('load', function() {
 		if (window.localStorage) {
-			Object.keys(window.localStorage).forEach(function(key) {
-				window.sessionStorage.setItem(key, window.localStorage.getItem(key));
-			});
 			window.localStorage.clear();
 			Meteor._localStorage = window.sessionStorage;
 		}
