@@ -1,4 +1,4 @@
-import emojione from 'emojione';
+import emojiToolkit from 'emoji-toolkit';
 import { Meteor } from 'meteor/meteor';
 import { Tracker } from 'meteor/tracker';
 import mem from 'mem';
@@ -11,161 +11,161 @@ import { getUserPreference } from '../../utils';
 // TODO remove fix below when issue is solved: https://github.com/joypixels/emojione/issues/617
 
 // add missing emojis not provided by JS object, but included on emoji.json
-emojione.shortnames +=
+emojiToolkit.shortnames +=
 	'|:tm:|:copyright:|:registered:|:digit_zero:|:digit_one:|:digit_two:|:digit_three:|:digit_four:|:digit_five:|:digit_six:|:digit_seven:|:digit_eight:|:digit_nine:|:pound_symbol:|:asterisk_symbol:';
-emojione.regShortNames = new RegExp(
-	`<object[^>]*>.*?<\/object>|<span[^>]*>.*?<\/span>|<(?:object|embed|svg|img|div|span|p|a)[^>]*>|(${emojione.shortnames})`,
+emojiToolkit.regShortNames = new RegExp(
+	`<object[^>]*>.*?<\/object>|<span[^>]*>.*?<\/span>|<(?:object|embed|svg|img|div|span|p|a)[^>]*>|(${emojiToolkit.shortnames})`,
 	'gi',
 );
 
-emojione.emojioneList[':tm:'] = {
+emojiToolkit.emojioneList[':tm:'] = {
 	uc_base: '2122',
 	uc_output: '2122-fe0f',
 	uc_match: '2122-fe0f',
 	uc_greedy: '2122-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':copyright:'] = {
+emojiToolkit.emojioneList[':copyright:'] = {
 	uc_base: '00a9',
 	uc_output: '00a9-f0ef',
 	uc_match: '00a9-fe0f',
 	uc_greedy: '00a9-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':registered:'] = {
+emojiToolkit.emojioneList[':registered:'] = {
 	uc_base: '00ae',
 	uc_output: '00ae-fe0f',
 	uc_match: '00ae-fe0f',
 	uc_greedy: '00ae-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_zero:'] = {
+emojiToolkit.emojioneList[':digit_zero:'] = {
 	uc_base: '0030',
 	uc_output: '0030-fe0f',
 	uc_match: '0030-fe0f',
 	uc_greedy: '0030-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_one:'] = {
+emojiToolkit.emojioneList[':digit_one:'] = {
 	uc_base: '0031',
 	uc_output: '0031-fe0f',
 	uc_match: '0031-fe0f',
 	uc_greedy: '0031-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_two:'] = {
+emojiToolkit.emojioneList[':digit_two:'] = {
 	uc_base: '0032',
 	uc_output: '0032-fe0f',
 	uc_match: '0032-fe0f',
 	uc_greedy: '0032-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_three:'] = {
+emojiToolkit.emojioneList[':digit_three:'] = {
 	uc_base: '0033',
 	uc_output: '0033-fe0f',
 	uc_match: '0033-fe0f',
 	uc_greedy: '0033-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_four:'] = {
+emojiToolkit.emojioneList[':digit_four:'] = {
 	uc_base: '0034',
 	uc_output: '0034-fe0f',
 	uc_match: '0034-fe0f',
 	uc_greedy: '0034-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_five:'] = {
+emojiToolkit.emojioneList[':digit_five:'] = {
 	uc_base: '0035',
 	uc_output: '0035-fe0f',
 	uc_match: '0035-fe0f',
 	uc_greedy: '0035-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_six:'] = {
+emojiToolkit.emojioneList[':digit_six:'] = {
 	uc_base: '0036',
 	uc_output: '0036-fe0f',
 	uc_match: '0036-fe0f',
 	uc_greedy: '0036-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_seven:'] = {
+emojiToolkit.emojioneList[':digit_seven:'] = {
 	uc_base: '0037',
 	uc_output: '0037-fe0f',
 	uc_match: '0037-fe0f',
 	uc_greedy: '0037-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_eight:'] = {
+emojiToolkit.emojioneList[':digit_eight:'] = {
 	uc_base: '0038',
 	uc_output: '0038-fe0f',
 	uc_match: '0038-fe0f',
 	uc_greedy: '0038-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':digit_nine:'] = {
+emojiToolkit.emojioneList[':digit_nine:'] = {
 	uc_base: '0039',
 	uc_output: '0039-fe0f',
 	uc_match: '0039-fe0f',
 	uc_greedy: '0039-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':pound_symbol:'] = {
+emojiToolkit.emojioneList[':pound_symbol:'] = {
 	uc_base: '0023',
 	uc_output: '0023-fe0f',
 	uc_match: '0023-fe0f',
 	uc_greedy: '0023-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 
-emojione.emojioneList[':asterisk_symbol:'] = {
+emojiToolkit.emojioneList[':asterisk_symbol:'] = {
 	uc_base: '002a',
 	uc_output: '002a-fe0f',
 	uc_match: '002a-fe0f',
 	uc_greedy: '002a-fe0f',
 	shortnames: [],
 	category: 'symbols',
-	emojiPackage: 'emojione',
+	emojiPackage: 'emoji-toolkit',
 };
 // end fix
 
@@ -209,9 +209,9 @@ emojione.emojioneList[':asterisk_symbol:'] = {
 			const alt = ns.unicodeAlt ? ns.convert(unicode.toUpperCase()) : shortname;
 
 			if (ns.sprites) {
-				return `<span class="emojione emojione-${category} _${fname}" ${title}>${alt}</span>`;
+				return `<span class="joypixels joypixels-${category} _${fname}" ${title}>${alt}</span>`;
 			}
-			return `<img class="emojione" alt="${alt}" ${title} src="${ePath}${fname}${ns.fileExtension}"/>`;
+			return `<img class="joypixels" alt="${alt}" ${title} src="${ePath}${fname}${ns.fileExtension}"/>`;
 		},
 		{ maxAge: 1000 },
 	);
@@ -238,9 +238,9 @@ emojione.emojioneList[':asterisk_symbol:'] = {
 			const alt = ns.unicodeAlt ? ns.convert(unicode.toUpperCase()) : ns.escapeHTML(m3);
 
 			if (ns.sprites) {
-				return `${m2}<span class="emojione emojione-${category} _${unicode}"  ${title}>${alt}</span>`;
+				return `${m2}<span class="joypixels joypixels-${category} _${unicode}"  ${title}>${alt}</span>`;
 			}
-			return `${m2}<img class="emojione" alt="${alt}" ${title} src="${ePath}${unicode}${ns.fileExtension}"/>`;
+			return `${m2}<img class="joypixels" alt="${alt}" ${title} src="${ePath}${unicode}${ns.fileExtension}"/>`;
 		},
 		{ maxAge: 1000, cacheKey: JSON.stringify },
 	);
@@ -258,16 +258,16 @@ emojione.emojioneList[':asterisk_symbol:'] = {
 
 		return str;
 	};
-})(emojione);
+})(emojiToolkit);
 
-emoji.packages.emojione = emojione;
-emoji.packages.emojione.sprites = true;
-emoji.packages.emojione.emojisByCategory = emojisByCategory;
-emoji.packages.emojione.emojiCategories = emojiCategories;
-emoji.packages.emojione.toneList = toneList;
+emoji.packages.emojiToolkit = emojiToolkit;
+emoji.packages.emojiToolkit.sprites = true;
+emoji.packages.emojiToolkit.emojisByCategory = emojisByCategory;
+emoji.packages.emojiToolkit.emojiCategories = emojiCategories;
+emoji.packages.emojiToolkit.toneList = toneList;
 
-emoji.packages.emojione.render = emojioneRender;
-emoji.packages.emojione.renderPicker = emojioneRenderFromShort;
+emoji.packages.emojiToolkit.render = emojioneRender;
+emoji.packages.emojiToolkit.renderPicker = emojioneRenderFromShort;
 
 // http://stackoverflow.com/a/26990347 function isSet() from Gajus
 function isSetNotNull(fn) {
@@ -281,10 +281,10 @@ function isSetNotNull(fn) {
 }
 
 // RocketChat.emoji.list is the collection of emojis from all emoji packages
-for (const key in emojione.emojioneList) {
-	if (emojione.emojioneList.hasOwnProperty(key)) {
-		const currentEmoji = emojione.emojioneList[key];
-		currentEmoji.emojiPackage = 'emojione';
+for (const key in emojiToolkit.emojioneList) {
+	if (emojiToolkit.emojioneList.hasOwnProperty(key)) {
+		const currentEmoji = emojiToolkit.emojioneList[key];
+		currentEmoji.emojiPackage = 'emojiToolkit';
 		emoji.list[key] = currentEmoji;
 
 		if (currentEmoji.shortnames) {
@@ -298,11 +298,11 @@ for (const key in emojione.emojioneList) {
 // Additional settings -- ascii emojis
 Meteor.startup(function () {
 	Tracker.autorun(function () {
-		if (isSetNotNull(() => emoji.packages.emojione)) {
+		if (isSetNotNull(() => emoji.packages.emojiToolkit)) {
 			if (isSetNotNull(() => getUserPreference(Meteor.userId(), 'convertAsciiEmoji'))) {
-				emoji.packages.emojione.ascii = getUserPreference(Meteor.userId(), 'convertAsciiEmoji');
+				emoji.packages.emojiToolkit.ascii = getUserPreference(Meteor.userId(), 'convertAsciiEmoji');
 			} else {
-				emoji.packages.emojione.ascii = true;
+				emoji.packages.emojiToolkit.ascii = true;
 			}
 		}
 	});
