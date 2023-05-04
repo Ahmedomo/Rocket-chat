@@ -1,7 +1,6 @@
 import _ from 'underscore';
 import { Meteor } from 'meteor/meteor';
-import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
-import { RateLimiter } from 'meteor/rate-limit';
+import { DDPRateLimiter } from '@rocket.chat/ddp-rate-limit';
 
 import { settings } from '../../../settings/server';
 import { metrics } from '../../../metrics/server';
@@ -46,84 +45,12 @@ DDPRateLimiter._increment = function (input) {
 	return _increment.call(DDPRateLimiter, input);
 };
 
-// Need to override the meteor's code duo to a problem with the callback reply
-// being shared among all matchs
-RateLimiter.prototype.check = function (input) {
-	// ==== BEGIN OVERRIDE ====
-	const session = Meteor.server.sessions.get(input.connectionId);
-	input.broadcastAuth = (session && session.connectionHandle && session.connectionHandle.broadcastAuth) === true;
-	// ==== END OVERRIDE ====
-
-	const self = this;
-	const reply = {
-		allowed: true,
-		timeToReset: 0,
-		numInvocationsLeft: Infinity,
-	};
-
-	const matchedRules = self._findAllMatchingRules(input);
-	_.each(matchedRules, function (rule) {
-		// ==== BEGIN OVERRIDE ====
-		const callbackReply = {
-			allowed: true,
-			timeToReset: 0,
-			numInvocationsLeft: Infinity,
-		};
-		// ==== END OVERRIDE ====
-
-		const ruleResult = rule.apply(input);
-		let numInvocations = rule.counters[ruleResult.key];
-
-		if (ruleResult.timeToNextReset < 0) {
-			// Reset all the counters since the rule has reset
-			rule.resetCounter();
-			ruleResult.timeSinceLastReset = new Date().getTime() - rule._lastResetTime;
-			ruleResult.timeToNextReset = rule.options.intervalTime;
-			numInvocations = 0;
-		}
-
-		if (numInvocations > rule.options.numRequestsAllowed) {
-			// Only update timeToReset if the new time would be longer than the
-			// previously set time. This is to ensure that if this input triggers
-			// multiple rules, we return the longest period of time until they can
-			// successfully make another call
-			if (reply.timeToReset < ruleResult.timeToNextReset) {
-				reply.timeToReset = ruleResult.timeToNextReset;
-			}
-			reply.allowed = false;
-			reply.numInvocationsLeft = 0;
-
-			// ==== BEGIN OVERRIDE ====
-			callbackReply.timeToReset = ruleResult.timeToNextReset;
-			callbackReply.allowed = false;
-			callbackReply.numInvocationsLeft = 0;
-			callbackReply.numInvocationsExceeded = numInvocations - rule.options.numRequestsAllowed;
-			rule._executeCallback(callbackReply, input);
-			// ==== END OVERRIDE ====
-		} else {
-			// If this is an allowed attempt and we haven't failed on any of the
-			// other rules that match, update the reply field.
-			if (rule.options.numRequestsAllowed - numInvocations < reply.numInvocationsLeft && reply.allowed) {
-				reply.timeToReset = ruleResult.timeToNextReset;
-				reply.numInvocationsLeft = rule.options.numRequestsAllowed - numInvocations;
-			}
-
-			// ==== BEGIN OVERRIDE ====
-			callbackReply.timeToReset = ruleResult.timeToNextReset;
-			callbackReply.numInvocationsLeft = rule.options.numRequestsAllowed - numInvocations;
-			rule._executeCallback(callbackReply, input);
-			// ==== END OVERRIDE ====
-		}
-	});
-	return reply;
-};
-
 const checkNameNonStream = (name) => name && !names.has(name) && !name.startsWith('stream-');
 const checkNameForStream = (name) => name && !names.has(name) && name.startsWith('stream-');
 
 const ruleIds = {};
 
-const callback = (msg, name) => (reply, input) => {
+const callback = (msg, name) => async (reply, input) => {
 	if (reply.allowed === false) {
 		rateLimiterLog({ msg, reply, input });
 		metrics.ddpRateLimitExceeded.inc({
@@ -136,7 +63,7 @@ const callback = (msg, name) => (reply, input) => {
 		});
 		// sleep before sending the error to slow down next requests
 		if (slowDownRate > 0 && reply.numInvocationsExceeded) {
-			Promise.await(sleep(slowDownRate * reply.numInvocationsExceeded));
+			await sleep(slowDownRate * reply.numInvocationsExceeded);
 		}
 		// } else {
 		// 	console.log('DDP RATE LIMIT:', message);

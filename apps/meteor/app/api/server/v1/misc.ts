@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { TAPi18n } from 'meteor/rocketchat:tap-i18n';
 import EJSON from 'ejson';
-import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
+import { DDPRateLimiter } from '@rocket.chat/ddp-rate-limit';
 import { escapeHTML } from '@rocket.chat/string-helpers';
 import {
 	isShieldSvgProps,
@@ -546,8 +546,9 @@ API.v1.addRoute(
 			};
 
 			try {
-				DDPRateLimiter._increment(rateLimiterInput);
-				const rateLimitResult = DDPRateLimiter._check(rateLimiterInput);
+				const session = Meteor.server.sessions.get(rateLimiterInput.connectionId);
+				await DDPRateLimiter._increment(rateLimiterInput);
+				const rateLimitResult = await DDPRateLimiter._check(rateLimiterInput, session);
 				if (!rateLimitResult.allowed) {
 					throw new Meteor.Error('too-many-requests', DDPRateLimiter.getErrorMessage(rateLimitResult), {
 						timeToReset: rateLimitResult.timeToReset,
@@ -606,9 +607,9 @@ API.v1.addRoute(
 			};
 
 			try {
-				DDPRateLimiter._increment(rateLimiterInput);
-
-				const rateLimitResult = DDPRateLimiter._check(rateLimiterInput);
+				await DDPRateLimiter._increment(rateLimiterInput);
+				const session = Meteor.server.sessions.get(rateLimiterInput.connectionId);
+				const rateLimitResult = await DDPRateLimiter._check(rateLimiterInput, session);
 				if (!rateLimitResult.allowed) {
 					throw new Meteor.Error('too-many-requests', DDPRateLimiter.getErrorMessage(rateLimitResult), {
 						timeToReset: rateLimitResult.timeToReset,
