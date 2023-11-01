@@ -78,8 +78,9 @@ jobs:
       matrix:
         mongodb-version: ${{ fromJSON(inputs.mongodb-version) }}
         shard: ${{ fromJSON(inputs.shard) }}
+        spec: ${{ fromJSON(inputs.specs) }}
 
-    name: MongoDB ${{ matrix.mongodb-version }} (${{ matrix.shard }}/${{ inputs.total-shard }})
+    name: MongoDB ${{ matrix.mongodb-version }} (${{ matrix.shard }}/${{ inputs.total-shard }}) (${{ matrix.spec == 'tests/end-to-end/api/**/*' && 'Team Collaboration' || 'Apps & Omnichannel' }})
 
     steps:
       - name: Launch MongoDB
@@ -184,27 +185,8 @@ jobs:
         env:
           WEBHOOK_TEST_URL: 'http://host.docker.internal:10000'
           IS_EE: ${{ inputs.release == 'ee' && 'true' || '' }}
-        run: |
-          for i in $(seq 1 2); do
-            npm run testapi && s=0 && break || s=$?
-
-            docker compose -f ../../docker-compose-ci.yml logs --tail=100
-
-            docker compose -f ../../docker-compose-ci.yml stop
-
-            docker exec mongodb bash -c 'if command -v mongosh ; then mongosh --eval "use rocketchat" --eval "db.dropDatabase()" rocketchat; else mongo rocketchat --eval "db.dropDatabase()"; fi'
-
-            NOW=$(date "+%Y-%m-%dT%H:%M:%S.000Z")
-
-            docker compose -f ../../docker-compose-ci.yml restart
-
-            until echo "$(docker compose -f ../../docker-compose-ci.yml logs rocketchat --since $NOW)" | grep -q "SERVER RUNNING"; do
-              echo "Waiting Rocket.Chat to start up"
-              ((c++)) && ((c==10)) && exit 1
-              sleep 10
-            done;
-          done;
-          exit $s
+          SPEC: ${{ matrix.spec }}
+        run:  npm run testapi -- --exit
 
       - name: E2E Test UI (${{ matrix.shard }}/${{ inputs.total-shard }})
         if: inputs.type == 'ui'
