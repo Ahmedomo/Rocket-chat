@@ -187,7 +187,7 @@ const UsersTable = ({
 						divider
 						current={current}
 						itemsPerPage={itemsPerPage}
-						count={data?.total || 0}
+						count={data.total || 0}
 						onSetItemsPerPage={setItemsPerPage}
 						onSetCurrent={setCurrent}
 						{...paginationProps}

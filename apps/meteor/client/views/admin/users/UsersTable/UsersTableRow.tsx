@@ -5,7 +5,7 @@ import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import type { DefaultUserInfo } from '@rocket.chat/rest-typings';
 import { UserAvatar } from '@rocket.chat/ui-avatar';
 import { useToastMessageDispatch, useTranslation } from '@rocket.chat/ui-contexts';
-import type { ReactElement } from 'react';
+import type { ReactElement, KeyboardEvent } from 'react';
 import React, { useMemo } from 'react';
 
 import { Roles } from '../../../../../app/models/client';
@@ -20,7 +20,7 @@ import { useSendWelcomeEmailMutation } from '../hooks/useSendWelcomeEmailMutatio
 
 type UsersTableRowProps = {
 	user: Serialized<DefaultUserInfo>;
-	onClick: (id: IUser['_id'], e: React.MouseEvent<HTMLElement, MouseEvent> | React.KeyboardEvent<HTMLElement>) => void;
+	onClick: (id: IUser['_id'], e: React.MouseEvent<HTMLElement, MouseEvent> | KeyboardEvent<HTMLElement>) => void;
 	mediaQuery: boolean;
 	onReload: () => void;
 	tab: IAdminUserTabs;
@@ -155,7 +155,7 @@ const UsersTableRow = ({ user, onClick, mediaQuery, onReload, tab, isSeatsCapExc
 			{mediaQuery && (
 				<GenericTableCell>
 					<Box fontScale='p2m' color='hint' withTruncatedText>
-						{username}
+						{`@${username}`}
 					</Box>
 				</GenericTableCell>
 			)}
