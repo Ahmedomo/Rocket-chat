@@ -79,12 +79,6 @@ Meteor.methods<ServerMethods>({
 				msg: message.msg,
 			};
 
-			if (originalMessage.attachments?.length) {
-				if (originalMessage.attachments[0].description !== undefined) {
-					delete messageObject.msg;
-					originalMessage.attachments[0].description = message.msg;
-				}
-			}
 			ChatMessage.update(
 				{
 					'_id': message._id,
