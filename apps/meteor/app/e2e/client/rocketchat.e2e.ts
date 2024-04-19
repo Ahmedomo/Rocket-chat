@@ -1,7 +1,7 @@
 import QueryString from 'querystring';
 import URL from 'url';
 
-import type { IE2EEMessage, IMessage, IRoom, ISubscription } from '@rocket.chat/core-typings';
+import type { IE2EEMessage, IMessage, IRoom, ISubscription, IUser } from '@rocket.chat/core-typings';
 import { isE2EEMessage } from '@rocket.chat/core-typings';
 import { Emitter } from '@rocket.chat/emitter';
 import EJSON from 'ejson';
@@ -19,6 +19,7 @@ import EnterE2EPasswordModal from '../../../client/views/e2e/EnterE2EPasswordMod
 import SaveE2EPasswordModal from '../../../client/views/e2e/SaveE2EPasswordModal';
 import { createQuoteAttachment } from '../../../lib/createQuoteAttachment';
 import { getMessageUrlRegex } from '../../../lib/getMessageUrlRegex';
+import { isTruthy } from '../../../lib/isTruthy';
 import { ChatRoom, Subscriptions, Messages } from '../../models/client';
 import { settings } from '../../settings/client';
 import { getUserAvatarURL } from '../../utils/client';
@@ -40,6 +41,7 @@ import {
 } from './helper';
 import { log, logError } from './logger';
 import { E2ERoom } from './rocketchat.e2e.room';
+
 import './events.js';
 
 let failedToDecodeKey = false;
@@ -64,12 +66,15 @@ class E2E extends Emitter {
 
 	public privateKey: CryptoKey | undefined;
 
+	private timeout: ReturnType<typeof setInterval> | null;
+
 	constructor() {
 		super();
 		this.started = false;
 		this.enabled = new ReactiveVar(false);
 		this._ready = new ReactiveVar(false);
 		this.instancesByRoomId = {};
+		this.timeout = null;
 
 		this.on('ready', async () => {
 			this._ready.set(true);
@@ -78,6 +83,9 @@ class E2E extends Emitter {
 
 			await this.decryptSubscriptions();
 			this.log('decryptSubscriptions -> Done');
+
+			await this.initiateKeyDistribution();
+			await this.handleAsyncE2EESuggestedKey();
 		});
 	}
 
@@ -95,6 +103,33 @@ class E2E extends Emitter {
 
 	isReady(): boolean {
 		return this.enabled.get() && this._ready.get();
+	}
+
+	async handleAsyncE2EESuggestedKey() {
+		const subs = Subscriptions.find({ E2ESuggestedKey: { $exists: true } }).fetch();
+		await Promise.all(
+			subs.map(async (sub) => {
+				if (!sub.E2ESuggestedKey || sub.E2EKey) {
+					return;
+				}
+
+				const e2eRoom = await e2e.getInstanceByRoomId(sub.rid);
+
+				if (!e2eRoom) {
+					return;
+				}
+
+				if (await e2eRoom.importGroupKey(sub.E2ESuggestedKey)) {
+					await e2e.acceptSuggestedKey(sub.rid);
+					e2eRoom.keyReceived();
+				} else {
+					console.warn('Invalid E2ESuggestedKey, rejecting', sub.E2ESuggestedKey);
+					await e2e.rejectSuggestedKey(sub.rid);
+				}
+
+				sub.encrypted ? e2eRoom.resume() : e2eRoom.pause();
+			}),
+		);
 	}
 
 	async getInstanceByRoomId(rid: IRoom['_id']): Promise<E2ERoom | null> {
@@ -508,6 +543,67 @@ class E2E extends Emitter {
 		);
 
 		return message;
+	}
+
+	fetchUsersWithWaitingKeys() {
+		return sdk.rest.get('/v1/e2e.fetchUsersWaitingForGroupKey');
+	}
+
+	provideUsersSuggestedGroupKeys(data: { usersSuggestedGroupKeys: Record<IRoom['_id'], { _id: IUser['_id']; key: string }[]> }) {
+		return sdk.rest.post('/v1/e2e.provideUsersSuggestedGroupKeys', data);
+	}
+
+	async getSuggestedE2EEKeys(usersWaitingForE2EKeys: Record<IRoom['_id'], { _id: IUser['_id']; public_key: string }[]>) {
+		const roomIds = Object.keys(usersWaitingForE2EKeys);
+		return Object.fromEntries(
+			(
+				await Promise.all(
+					roomIds.map(async (room) => {
+						const e2eRoom = await this.getInstanceByRoomId(room);
+
+						if (!e2eRoom) {
+							return;
+						}
+						const usersWithKeys = await e2eRoom.encryptGroupKeyForParticipantsWaitingForTheKeys(usersWaitingForE2EKeys[room]);
+
+						if (!usersWithKeys) {
+							return;
+						}
+
+						return [room, usersWithKeys];
+					}),
+				)
+			).filter(isTruthy),
+		);
+	}
+
+	async initiateKeyDistribution() {
+		if (this.timeout) {
+			return;
+		}
+
+		this.timeout = setInterval(async () => {
+			const { usersWaitingForE2EKeys, hasMore } = await this.fetchUsersWithWaitingKeys();
+
+			if (!hasMore && this.timeout) {
+				clearTimeout(this.timeout);
+				this.timeout = null;
+			}
+
+			if (!usersWaitingForE2EKeys) {
+				return;
+			}
+
+			const userKeysWithRooms = await this.getSuggestedE2EEKeys(usersWaitingForE2EKeys);
+
+			try {
+				await this.provideUsersSuggestedGroupKeys({ usersSuggestedGroupKeys: userKeysWithRooms });
+			} catch (error) {
+				this.timeout && clearTimeout(this.timeout);
+				this.timeout = null;
+				return this.error('Error providing group key to users: ', error);
+			}
+		}, 10000);
 	}
 }
 

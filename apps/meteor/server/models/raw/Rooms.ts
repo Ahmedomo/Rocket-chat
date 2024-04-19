@@ -1970,4 +1970,80 @@ export class RoomsRaw extends BaseRaw<IRoom> implements IRoomsModel {
 
 		return this.updateOne(query, update);
 	}
+
+	addUserIdToE2EEQueueByRoomIds(roomIds: IRoom['_id'][], uid: IUser['_id']): Promise<Document | UpdateResult> {
+		const query: Filter<IRoom> = {
+			_id: {
+				$in: roomIds,
+			},
+			'usersWaitingForE2EKeys.userId': { $ne: uid },
+			encrypted: true,
+		};
+
+		const update: UpdateFilter<IRoom> = {
+			$push: {
+				usersWaitingForE2EKeys: {
+					userId: uid,
+					ts: new Date(),
+				},
+			},
+		};
+
+		return this.updateMany(query, update);
+	}
+
+	removeUsersFromE2EEQueueByRoomIds(roomIds: IRoom['_id'][], uids: IUser['_id'][]): Promise<Document | UpdateResult> {
+		const query: Filter<IRoom> = {
+			'_id': {
+				$in: roomIds,
+			},
+			'usersWaitingForE2EKeys.userId': {
+				$in: uids,
+			},
+			encrypted: true,
+		};
+
+		const update: UpdateFilter<IRoom> = {
+			$pull: {
+				usersWaitingForE2EKeys: { userId: { $in: uids }},
+			},
+		};
+
+		return this.updateMany(query, update);
+	}
+
+	findRoomsByRoomIdsWithE2EEQueue(roomIds: IRoom['_id'][], options?: FindOptions<IRoom>): FindCursor<IRoom> {
+		const query: Filter<IRoom> = {
+			_id: {
+				$in: roomIds,
+			},
+			usersWaitingForE2EKeys: {
+				$exists: true,
+			},
+			encrypted: true,
+		};
+
+		return this.find(query, options);
+	}
+
+	async fetchRandomUsersFromE2EEQueue(roomIds: IRoom['_id'][], numberOfRooms: number, queueSize: number): Promise<IRoom[]> {
+		const aggregate = [
+			{
+				$match: {
+					_id: {
+						$in: roomIds,
+					},
+					usersWaitingForE2EKeys: {
+						$exists: true,
+					},
+					encrypted: true,
+				}
+			},
+			{ $sample: { size: queueSize }},
+			{ $limit: numberOfRooms },
+		];
+
+		return await this.col.aggregate<IRoom>(aggregate).toArray();
+	}
+
 }

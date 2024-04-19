@@ -5,9 +5,12 @@ import {
 	ise2eSetUserPublicAndPrivateKeysParamsPOST,
 	ise2eUpdateGroupKeyParamsPOST,
 } from '@rocket.chat/rest-typings';
+import { isE2EProvideUsersGroupKeyProps } from '@rocket.chat/rest-typings/dist/v1/e2e';
 import { Meteor } from 'meteor/meteor';
 
+import { fetchUsersWaitingForGroupKey } from '../../../e2e/server/functions/fetchUsersWaitingForGroupKey';
 import { handleSuggestedGroupKey } from '../../../e2e/server/functions/handleSuggestedGroupKey';
+import { provideUsersSuggestedGroupKeys } from '../../../e2e/server/functions/provideUsersSuggestedGroupKeys';
 import { API } from '../api';
 
 API.v1.addRoute(
@@ -225,6 +228,38 @@ API.v1.addRoute(
 			const { rid } = this.bodyParams;
 
 			await handleSuggestedGroupKey('reject', rid, this.userId, 'e2e.rejectSuggestedGroupKey');
+
+			return API.v1.success();
+		},
+	},
+);
+
+API.v1.addRoute(
+	'e2e.fetchUsersWaitingForGroupKey',
+	{
+		authRequired: true,
+	},
+	{
+		async get() {
+			const { usersWaitingForE2EKeys, hasMore } = await fetchUsersWaitingForGroupKey(this.userId);
+
+			return API.v1.success({
+				usersWaitingForE2EKeys,
+				hasMore,
+			});
+		},
+	},
+);
+
+API.v1.addRoute(
+	'e2e.provideUsersSuggestedGroupKeys',
+	{
+		authRequired: true,
+		validateParams: isE2EProvideUsersGroupKeyProps,
+	},
+	{
+		async post() {
+			await provideUsersSuggestedGroupKeys(this.userId, this.bodyParams.usersSuggestedGroupKeys);
 
 			return API.v1.success();
 		},

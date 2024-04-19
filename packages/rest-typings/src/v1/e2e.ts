@@ -1,4 +1,4 @@
-import type { IUser } from '@rocket.chat/core-typings';
+import type { IRoom, IUser } from '@rocket.chat/core-typings';
 import Ajv from 'ajv';
 
 const ajv = new Ajv({
@@ -87,6 +87,35 @@ const E2eSetRoomKeyIdSchema = {
 
 export const isE2eSetRoomKeyIdProps = ajv.compile<E2eSetRoomKeyIdProps>(E2eSetRoomKeyIdSchema);
 
+type E2EProvideUsersGroupKeyProps = {
+	usersSuggestedGroupKeys: Record<IRoom['_id'], { _id: IUser['_id']; key: string }[]>;
+};
+
+const E2EProvideUsersGroupKeySchema = {
+	type: 'object',
+	properties: {
+		usersSuggestedGroupKeys: {
+			type: 'object',
+			additionalProperties: {
+				type: 'array',
+				items: {
+					type: 'object',
+					properties: {
+						_id: { type: 'string' },
+						key: { type: 'string' },
+					},
+					required: ['_id', 'key'],
+					additionalProperties: false,
+				},
+			},
+		},
+	},
+	required: ['usersSuggestedGroupKeys'],
+	additionalProperties: false,
+};
+
+export const isE2EProvideUsersGroupKeyProps = ajv.compile<E2EProvideUsersGroupKeyProps>(E2EProvideUsersGroupKeySchema);
+
 export type E2eEndpoints = {
 	'/v1/e2e.setUserPublicAndPrivateKeys': {
 		POST: (params: E2eSetUserPublicAndPrivateKeysProps) => void;
@@ -110,5 +139,11 @@ export type E2eEndpoints = {
 	};
 	'/v1/e2e.fetchMyKeys': {
 		GET: () => { public_key: string; private_key: string };
+	};
+	'/v1/e2e.fetchUsersWaitingForGroupKey': {
+		GET: () => { usersWaitingForE2EKeys: Record<IRoom['_id'], { _id: IUser['_id']; public_key: string }[]>; hasMore: boolean };
+	};
+	'/v1/e2e.provideUsersSuggestedGroupKeys': {
+		POST: (params: E2EProvideUsersGroupKeyProps) => void;
 	};
 };
