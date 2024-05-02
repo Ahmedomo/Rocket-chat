@@ -5,7 +5,7 @@ import { RoomType } from '@rocket.chat/apps-engine/definition/rooms';
 import type { IUser } from '@rocket.chat/apps-engine/definition/users';
 import { RoomBridge } from '@rocket.chat/apps-engine/server/bridges/RoomBridge';
 import type { ISubscription, IUser as ICoreUser, IRoom as ICoreRoom } from '@rocket.chat/core-typings';
-import { Subscriptions, Users, Rooms } from '@rocket.chat/models';
+import { Subscriptions, Users, Rooms, Messages } from '@rocket.chat/models';
 
 import { createDirectMessage } from '../../../../server/methods/createDirectMessage';
 import { createDiscussion } from '../../../discussion/server/methods/createDiscussion';
@@ -100,6 +100,38 @@ export class AppRoomBridge extends RoomBridge {
 		}
 
 		return this.orch.getConverters()?.get('users').convertById(room.u._id);
+	}
+
+	protected async getMessages(
+		roomId: string,
+		options: {
+			limit: number;
+			skip?: number;
+			sort?: Record<string, 1 | -1>;
+		},
+		appId: string,
+	): Promise<IMessage[]> {
+		this.orch.debugLog(`The App ${appId} is getting the messages of the room: "${roomId}"`);
+		if (!Number.isFinite(options.limit) || options.limit < 1) {
+			options.limit = 100;
+		}
+
+		const { limit, skip, sort = { ts: -1 } } = options;
+
+		const messageConverter = this.orch.getConverters()?.get('messages');
+		if (!messageConverter) {
+			throw new Error('Message converter not found');
+		}
+
+		const messageQueryOptions = {
+			limit: Math.min(limit, 100),
+			skip,
+			sort,
+		};
+
+		const messages = await Messages.findVisibleByRoomId(roomId, messageQueryOptions).toArray();
+
+		return Promise.all(messages.map((message) => messageConverter.convertMessage(message)));
 	}
 
 	protected async getMembers(roomId: string, appId: string): Promise<Array<IUser>> {
