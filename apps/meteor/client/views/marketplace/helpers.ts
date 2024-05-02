@@ -8,7 +8,7 @@ import { appErroredStatuses } from './helpers/appErroredStatuses';
 
 export const appEnabledStatuses = [AppStatus.AUTO_ENABLED, AppStatus.MANUALLY_ENABLED];
 
-export type Actions = 'update' | 'install' | 'purchase' | 'request';
+export type Actions = 'update' | 'install' | 'purchase' | 'request' | 'subscribe';
 
 type appButtonResponseProps = {
 	action: Actions;

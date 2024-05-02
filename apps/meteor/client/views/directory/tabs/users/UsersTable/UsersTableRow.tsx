@@ -1,4 +1,4 @@
-import type { IUser, Serialized } from '@rocket.chat/core-typings';
+import type { IUser, IUserEmail, Serialized } from '@rocket.chat/core-typings';
 import { Box, Flex } from '@rocket.chat/fuselage';
 import { UserAvatar } from '@rocket.chat/ui-avatar';
 import React from 'react';
@@ -8,7 +8,22 @@ import MarkdownText from '../../../../../components/MarkdownText';
 import { useFormatDate } from '../../../../../hooks/useFormatDate';
 
 type UsersTableRowProps = {
-	user: Serialized<IUser> & { domain?: string };
+	user: Serialized<
+		| (IUser & { domain?: unknown })
+		| {
+				_id?: string;
+				username?: string;
+				name?: string;
+				bio?: string;
+				nickname?: string;
+				emails?: IUserEmail[];
+				federation?: unknown;
+				isRemote: true;
+				domain?: unknown;
+				createdAt?: undefined;
+				avatarETag?: undefined;
+		  }
+	>;
 	onClick: (username: IUser['username']) => (e: React.KeyboardEvent | React.MouseEvent) => void;
 	mediaQuery: boolean;
 	federation: boolean;
@@ -52,7 +67,7 @@ const UsersTableRow = ({
 			{federation && <GenericTableCell withTruncatedText>{domain}</GenericTableCell>}
 			{mediaQuery && (
 				<GenericTableCell fontScale='p2' color='hint' withTruncatedText>
-					{formatDate(createdAt)}
+					{createdAt ? formatDate(createdAt) : null}
 				</GenericTableCell>
 			)}
 		</GenericTableRow>

@@ -1,9 +1,14 @@
+import type { IRoom } from '@rocket.chat/core-typings';
 import { Box, Button, Field, FieldLabel, Modal } from '@rocket.chat/fuselage';
 import { useToastMessageDispatch, useEndpoint, useTranslation } from '@rocket.chat/ui-contexts';
 import React, { memo, useCallback } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 
 import RoomsAvailableForTeamsAutoComplete from './RoomsAvailableForTeamsAutoComplete';
+
+type AddExistingModalFields = {
+	rooms: IRoom['_id'][];
+};
 
 type AddExistingModalProps = {
 	teamId: string;
@@ -21,10 +26,10 @@ const AddExistingModal = ({ teamId, onClose, reload }: AddExistingModalProps) =>
 		control,
 		formState: { isDirty },
 		handleSubmit,
-	} = useForm({ defaultValues: { rooms: [] } });
+	} = useForm<AddExistingModalFields>({ defaultValues: { rooms: [] } });
 
 	const handleAddChannels = useCallback(
-		async ({ rooms }) => {
+		async ({ rooms }: AddExistingModalFields) => {
 			try {
 				await addRoomEndpoint({
 					rooms,

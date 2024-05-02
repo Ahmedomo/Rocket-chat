@@ -62,7 +62,12 @@ const LoginSwitchLanguageFooter = ({
 			{suggestions.map((suggestion) => (
 				<Button secondary small mie={8} key={suggestion.key} onClick={handleSwitchLanguageClick(suggestion)}>
 					<Trans i18nKey='registration.component.switchLanguage' tOptions={{ lng: suggestion.key }}>
-						Change to <strong>{{ name: suggestion.ogName }}</strong>
+						Change to{' '}
+						<strong>
+							{
+								{ name: suggestion.ogName } as any // FIXME: limitation of JSX types explained at https://github.com/i18next/react-i18next/issues/1483
+							}
+						</strong>
 					</Trans>
 				</Button>
 			))}

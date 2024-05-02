@@ -4,9 +4,11 @@ import { useTranslation } from '@rocket.chat/ui-contexts';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesUserPresenceSection = () => {
 	const t = useTranslation();
-	const { register, control } = useFormContext();
+	const { register, control } = useFormContext<AccountPreferencesData>();
 
 	const enableAutoAwayId = useUniqueId();
 	const idleTimeLimit = useUniqueId();

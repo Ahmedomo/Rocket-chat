@@ -91,7 +91,9 @@ const UserAutoCompleteMultipleFederated = ({
 	);
 
 	return (
-		<OptionsContext.Provider value={{ options }}>
+		// FIXME
+		<OptionsContext.Provider value={{ options: options as any }}>
+			{' '}
 			<MultiSelectFiltered
 				{...props}
 				data-qa-type='user-auto-complete-input'

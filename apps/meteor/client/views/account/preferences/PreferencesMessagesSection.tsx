@@ -5,9 +5,11 @@ import { useTranslation } from '@rocket.chat/ui-contexts';
 import React, { useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesMessagesSection = () => {
 	const t = useTranslation();
-	const { control } = useFormContext();
+	const { control } = useFormContext<AccountPreferencesData>();
 
 	const alsoSendThreadMessageToChannelOptions = useMemo(
 		(): SelectOption[] => [

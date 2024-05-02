@@ -1,6 +1,8 @@
-export const isValidReference = (reference: React.RefObject<HTMLElement>, e: { target: Node | null }): boolean => {
+import type { RefObject } from 'react';
+
+export const isValidReference = (reference: RefObject<HTMLElement>, e: { target?: unknown }): boolean => {
 	const isValidTarget = Boolean(e.target);
-	const isValidReference = e.target !== reference.current && !reference.current?.contains(e.target);
+	const isValidReference = e.target !== reference.current && !reference.current?.contains(e.target as Node);
 
 	return isValidTarget && isValidReference;
 };

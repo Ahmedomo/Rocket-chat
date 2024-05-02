@@ -9,7 +9,7 @@ import BurgerMenuButton from './BurgerMenuButton';
 const BurgerMenu = (): ReactElement => {
 	const { sidebar } = useLayout();
 	const isLayoutEmbedded = useEmbeddedLayout();
-	const unreadMessagesBadge = useSession('unread');
+	const unreadMessagesBadge = useSession('unread') as boolean | number | string;
 
 	const toggleSidebar = useMutableCallback(() => sidebar.toggle());
 

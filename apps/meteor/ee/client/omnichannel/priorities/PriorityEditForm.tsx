@@ -9,7 +9,7 @@ import { Controller, useForm } from 'react-hook-form';
 
 import StringSettingInput from '../../../../client/views/admin/settings/inputs/StringSettingInput';
 
-export type PriorityFormData = { name: string; reset: boolean };
+export type PriorityEditFormFields = { name: string; reset: boolean };
 
 type ILivechatClientPriority = Serialized<ILivechatPriority> & {
 	i18n: TranslationKey;
@@ -18,7 +18,7 @@ type ILivechatClientPriority = Serialized<ILivechatPriority> & {
 export type PriorityEditFormProps = {
 	data: ILivechatClientPriority;
 	onCancel: () => void;
-	onSave: (values: PriorityFormData) => Promise<void>;
+	onSave: (values: PriorityEditFormFields) => Promise<void>;
 };
 
 type PrioritySaveException = { success: false; error: TranslationKey | undefined };
@@ -38,7 +38,7 @@ const PriorityEditForm = ({ data, onSave, onCancel }: PriorityEditFormProps): Re
 		formState: { errors, isValid, isDirty },
 		setError,
 		handleSubmit,
-	} = useForm<PriorityFormData>({
+	} = useForm<PriorityEditFormFields>({
 		mode: 'onChange',
 		defaultValues: data ? { name: dirty ? name : defaultName } : {},
 	});

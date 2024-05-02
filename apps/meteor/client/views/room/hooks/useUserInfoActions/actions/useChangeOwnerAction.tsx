@@ -1,6 +1,6 @@
 import type { IRoom, IUser } from '@rocket.chat/core-typings';
 import { isRoomFederated } from '@rocket.chat/core-typings';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import { escapeHTML } from '@rocket.chat/string-helpers';
 import { useTranslation, usePermission, useUserRoom, useUserSubscription, useSetModal, useUser } from '@rocket.chat/ui-contexts';
 import type { ReactElement } from 'react';
@@ -63,54 +63,50 @@ export const useChangeOwnerAction = (user: Pick<IUser, '_id' | 'username'>, rid:
 		closeModal();
 	}, [changeOwner, rid, uid, closeModal]);
 
-	const handleChangeOwner = useCallback(
-		({ userId }) => {
-			if (!isRoomFederated(room)) {
-				return changeOwner({ roomId: rid, userId: uid });
-			}
-			const changingOwnRole = userId === loggedUserId;
+	const handleChangeOwner = useEffectEvent(() => {
+		if (!isRoomFederated(room)) {
+			return changeOwner({ roomId: rid, userId: uid });
+		}
+		const changingOwnRole = uid === loggedUserId;
 
-			if (changingOwnRole && loggedUserIsOwner) {
-				return setModal(() =>
-					getWarningModalForFederatedRooms(
-						closeModal,
-						handleConfirm,
-						t('Federation_Matrix_losing_privileges'),
-						t('Yes_continue'),
-						t('Federation_Matrix_losing_privileges_warning'),
-					),
-				);
-			}
+		if (changingOwnRole && loggedUserIsOwner) {
+			return setModal(
+				getWarningModalForFederatedRooms(
+					closeModal,
+					handleConfirm,
+					t('Federation_Matrix_losing_privileges'),
+					t('Yes_continue'),
+					t('Federation_Matrix_losing_privileges_warning'),
+				),
+			);
+		}
 
-			if (!changingOwnRole && loggedUserIsOwner) {
-				return setModal(() =>
-					getWarningModalForFederatedRooms(
-						closeModal,
-						handleConfirm,
-						t('Warning'),
-						t('Yes_continue'),
-						t('Federation_Matrix_giving_same_permission_warning'),
-					),
-				);
-			}
+		if (!changingOwnRole && loggedUserIsOwner) {
+			return setModal(
+				getWarningModalForFederatedRooms(
+					closeModal,
+					handleConfirm,
+					t('Warning'),
+					t('Yes_continue'),
+					t('Federation_Matrix_giving_same_permission_warning'),
+				),
+			);
+		}
 
-			changeOwner({ roomId: rid, userId: uid });
-		},
-		[setModal, loggedUserId, loggedUserIsOwner, t, rid, uid, changeOwner, closeModal, handleConfirm, room],
-	);
+		changeOwner({ roomId: rid, userId: uid });
+	});
 
-	const changeOwnerAction = useMutableCallback(async () => handleChangeOwner({ roomId: rid, userId: uid }));
 	const changeOwnerOption = useMemo(
 		() =>
 			(isRoomFederated(room) && roomCanSetOwner) || (!isRoomFederated(room) && roomCanSetOwner && userCanSetOwner)
 				? {
 						content: t(isOwner ? 'Remove_as_owner' : 'Set_as_owner'),
 						icon: 'shield-check' as const,
-						onClick: changeOwnerAction,
+						onClick: handleChangeOwner,
 						type: 'privileges' as UserInfoActionType,
 				  }
 				: undefined,
-		[changeOwnerAction, roomCanSetOwner, userCanSetOwner, isOwner, t, room],
+		[handleChangeOwner, roomCanSetOwner, userCanSetOwner, isOwner, t, room],
 	);
 
 	return changeOwnerOption;

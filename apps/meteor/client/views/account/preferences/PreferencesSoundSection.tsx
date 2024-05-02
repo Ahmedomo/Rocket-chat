@@ -6,13 +6,15 @@ import type { ChangeEvent } from 'react';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesSoundSection = () => {
 	const t = useTranslation();
 
 	const customSound = useCustomSound();
 	const soundsList: SelectOption[] = customSound?.getList()?.map((value) => [value._id, value.name]) || [];
-	const { control, watch } = useFormContext();
-	const { newMessageNotification, notificationsSoundVolume } = watch();
+	const { control, watch } = useFormContext<AccountPreferencesData>();
+	const { newMessageNotification, notificationsSoundVolume = 0 } = watch();
 
 	const newRoomNotificationId = useUniqueId();
 	const newMessageNotificationId = useUniqueId();
@@ -91,7 +93,7 @@ const PreferencesSoundSection = () => {
 									max='100'
 									value={value}
 									onChange={(e: ChangeEvent<HTMLInputElement>) => {
-										customSound.play(newMessageNotification, { volume: notificationsSoundVolume / 100 });
+										if (newMessageNotification) customSound.play(newMessageNotification, { volume: notificationsSoundVolume / 100 });
 										onChange(Math.max(0, Math.min(Number(e.currentTarget.value), 100)));
 									}}
 								/>

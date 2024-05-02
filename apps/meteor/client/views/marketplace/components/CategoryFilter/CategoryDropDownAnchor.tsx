@@ -2,16 +2,16 @@ import type { Button } from '@rocket.chat/fuselage';
 import { Box, Icon } from '@rocket.chat/fuselage';
 import colorTokens from '@rocket.chat/fuselage-tokens/colors.json';
 import { useTranslation } from '@rocket.chat/ui-contexts';
-import type { ComponentProps, MouseEventHandler } from 'react';
+import type { ComponentProps, ForwardedRef, MouseEventHandler, PropsWithoutRef } from 'react';
 import React, { forwardRef } from 'react';
 
-type CategoryDropDownAnchorProps = { selectedCategoriesCount: number; onClick?: MouseEventHandler<HTMLElement> } & ComponentProps<
-	typeof Button
+type CategoryDropDownAnchorProps = { selectedCategoriesCount: number; onClick?: MouseEventHandler<HTMLElement> } & PropsWithoutRef<
+	ComponentProps<typeof Button>
 >;
 
-const CategoryDropDownAnchor = forwardRef<HTMLElement, CategoryDropDownAnchorProps>(function CategoryDropDownAnchor(
-	{ onClick, selectedCategoriesCount, ...props },
-	ref,
+const CategoryDropDownAnchor = forwardRef(function CategoryDropDownAnchor(
+	{ onClick, selectedCategoriesCount, ...props }: CategoryDropDownAnchorProps,
+	ref: ForwardedRef<HTMLElement>,
 ) {
 	const t = useTranslation();
 

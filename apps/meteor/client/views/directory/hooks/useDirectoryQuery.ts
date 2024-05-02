@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 export function useDirectoryQuery(
 	{ text, itemsPerPage, current }: { text: string; current: number; itemsPerPage: number },
 	[column, direction]: [string, 'asc' | 'desc'],
-	type: string,
+	type: 'channels' | 'teams' | 'users',
 	workspace = 'local',
 ): { offset?: number | undefined; count?: number; query: string; sort: string } {
 	return useMemo(

@@ -15,13 +15,13 @@ import ModalProviderWithRegion from './ModalProviderWithRegion';
 const TestContext = createContext({ title: 'default' });
 const emitter = new Emitter();
 
-const TestModal = ({ emitterEvent, modalFunc }: { emitterEvent: string; modalFunc?: () => ReactNode }) => {
+const TestModal = ({ emitterEvent, modalFunc }: { emitterEvent: string; modalFunc?: ReactNode }) => {
 	const setModal = useSetModal();
 	const { title } = useContext(TestContext);
 
 	useEffect(() => {
 		emitter.on(emitterEvent, () => {
-			setModal(modalFunc || <GenericModal title={title} onClose={() => undefined}></GenericModal>);
+			setModal(modalFunc || <GenericModal title={title} onClose={() => undefined} />);
 		});
 	}, [emitterEvent, setModal, title, modalFunc]);
 
@@ -45,7 +45,7 @@ describe('Modal Provider', () => {
 		render(
 			<Suspense fallback={null}>
 				<ModalProviderWithRegion>
-					<TestModal emitterEvent='open' modalFunc={() => <GenericModal title='function modal' onClose={() => undefined} />} />
+					<TestModal emitterEvent='open' modalFunc={<GenericModal title='function modal' onClose={() => undefined} />} />
 				</ModalProviderWithRegion>
 			</Suspense>,
 		);

@@ -39,4 +39,4 @@ const ModalProvider = ({ children, region }: ModalProviderProps) => {
 	return <ModalContext.Provider value={contextValue} children={children} />;
 };
 
-export default memo<typeof ModalProvider>(ModalProvider);
+export default memo(ModalProvider);

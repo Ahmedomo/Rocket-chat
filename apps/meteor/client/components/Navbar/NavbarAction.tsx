@@ -1,7 +1,11 @@
-import type { FC } from 'react';
+import type { ReactNode } from 'react';
 import React from 'react';
 
-export const NavbarAction: FC = ({ children, ...props }) => {
+type NavbarActionProps = JSX.IntrinsicElements['li'] & {
+	children?: ReactNode;
+};
+
+export const NavbarAction = ({ children, ...props }: NavbarActionProps) => {
 	return (
 		<li style={{ position: 'relative' }} role='menuitem' {...props}>
 			{children}

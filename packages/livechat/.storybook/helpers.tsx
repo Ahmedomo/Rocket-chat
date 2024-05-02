@@ -1,6 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { type DecoratorFunction } from '@storybook/csf';
-import type { Args, PreactFramework } from '@storybook/preact';
+import type { DecoratorFn } from '@storybook/react';
 import { loremIpsum as originalLoremIpsum } from 'lorem-ipsum';
 
 import { ScreenContext } from '../src/components/Screen/ScreenProvider';
@@ -8,7 +7,7 @@ import gazzoAvatar from './assets/gazzo.jpg';
 import martinAvatar from './assets/martin.jpg';
 import tassoAvatar from './assets/tasso.jpg';
 
-export const screenDecorator: DecoratorFunction<PreactFramework, Args> = (storyFn) => (
+export const screenDecorator: DecoratorFn = (storyFn) => (
 	<div style={{ display: 'flex', width: 365, height: 500 }}>
 		<ScreenContext.Provider value={screenProps()}>{storyFn()}</ScreenContext.Provider>
 	</div>

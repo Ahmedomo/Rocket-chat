@@ -1,5 +1,5 @@
 import { AppStatus } from '@rocket.chat/apps-engine/definition/AppStatus';
-import type { App } from '@rocket.chat/core-typings';
+import type { App, AppPermission } from '@rocket.chat/core-typings';
 import { Box, Icon } from '@rocket.chat/fuselage';
 import {
 	useSetModal,
@@ -70,12 +70,12 @@ export const useAppMenu = (app: App, isAppDetailsPage: boolean) => {
 		| 'Buy'
 		| 'Request'
 		| 'Requested';
-	const action = button?.action || '';
+	const action = button?.action;
 
-	const setAppStatus = useEndpoint<'POST', '/apps/:id/status'>('POST', '/apps/:id/status', { id: app.id });
+	const setAppStatus = useEndpoint('POST', '/apps/:id/status', { id: app.id });
 	const buildExternalUrl = useEndpoint('GET', '/apps');
-	const syncApp = useEndpoint<'POST', '/apps/:id/sync'>('POST', '/apps/:id/sync', { id: app.id });
-	const uninstallApp = useEndpoint<'DELETE', '/apps/:id'>('DELETE', '/apps/:id', { id: app.id });
+	const syncApp = useEndpoint('POST', '/apps/:id/sync', { id: app.id });
+	const uninstallApp = useEndpoint('DELETE', '/apps/:id', { id: app.id });
 
 	const canAppBeSubscribed = app.purchaseType === 'subscription';
 	const isSubscribed = app.subscriptionInfo && ['active', 'trialing'].includes(app.subscriptionInfo.status);
@@ -89,7 +89,7 @@ export const useAppMenu = (app: App, isAppDetailsPage: boolean) => {
 	const marketplaceActions = useMarketplaceActions();
 
 	const installationSuccess = useCallback(
-		async (action: Actions | '', permissionsGranted) => {
+		async (action: Actions | undefined, permissionsGranted?: AppPermission[]) => {
 			if (action) {
 				if (action === 'purchase') {
 					setPurchased(true);
@@ -269,7 +269,7 @@ export const useAppMenu = (app: App, isAppDetailsPage: boolean) => {
 	]);
 
 	const incompatibleIconName = useCallback(
-		(app, action) => {
+		(app: App, action: Actions) => {
 			if (!app.versionIncompatible) {
 				if (action === 'update') {
 					return 'refresh';

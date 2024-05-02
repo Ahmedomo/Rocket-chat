@@ -23,6 +23,12 @@ import { AsyncStatePhase } from '../../../hooks/useAsyncState';
 import AutoCompleteAgent from '../../AutoCompleteAgent';
 import { useDepartmentsList } from '../hooks/useDepartmentsList';
 
+type ForwardChatModalFields = {
+	department: string;
+	username: string;
+	comment: string;
+};
+
 const ForwardChatModal = ({
 	onForward,
 	onCancel,
@@ -45,7 +51,7 @@ const ForwardChatModal = ({
 		setValue,
 		watch,
 		formState: { isSubmitting },
-	} = useForm();
+	} = useForm<ForwardChatModalFields>();
 
 	useEffect(() => {
 		setFocus('comment');
@@ -63,7 +69,7 @@ const ForwardChatModal = ({
 	const { phase: departmentsPhase, items: departments, itemCount: departmentsTotal } = useRecordList(departmentsList);
 
 	const endReached = useCallback(
-		(start) => {
+		(start: number) => {
 			if (departmentsPhase !== AsyncStatePhase.LOADING) {
 				loadMoreDepartments(start, Math.min(50, departmentsTotal));
 			}
@@ -72,7 +78,7 @@ const ForwardChatModal = ({
 	);
 
 	const onSubmit = useCallback(
-		async ({ department: departmentId, username, comment }) => {
+		async ({ department: departmentId, username, comment }: ForwardChatModalFields) => {
 			let uid;
 
 			if (username) {

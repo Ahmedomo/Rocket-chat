@@ -1,3 +1,4 @@
+import type { IExternalComponent } from '@rocket.chat/apps-engine/definition/externalComponent';
 import { Avatar, Icon, Table, TableBody, TableCell, TableHead, TableRow } from '@rocket.chat/fuselage';
 import { useSetModal, useTranslation } from '@rocket.chat/ui-contexts';
 import type { ReactElement } from 'react';
@@ -24,11 +25,11 @@ const GameCenterList = ({ handleClose, handleOpenGame, games, isLoading }: IGame
 	const t = useTranslation();
 	const setModal = useSetModal();
 	const handleInvitePlayer = useCallback(
-		(game) => {
+		(game: IExternalComponent) => {
 			const handleClose = (): void => {
 				setModal(null);
 			};
-			setModal(() => <GameCenterInvitePlayersModal onClose={handleClose} game={game} />);
+			setModal(<GameCenterInvitePlayersModal onClose={handleClose} game={game} />);
 		},
 		[setModal],
 	);

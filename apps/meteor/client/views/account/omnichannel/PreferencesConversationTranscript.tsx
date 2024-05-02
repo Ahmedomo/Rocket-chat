@@ -5,11 +5,12 @@ import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
 import { useHasLicenseModule } from '../../../../ee/client/hooks/useHasLicenseModule';
+import type { OmnichannelPreferencesPageFields } from './OmnichannelPreferencesPage';
 
 const PreferencesConversationTranscript = () => {
 	const t = useTranslation();
 
-	const { register } = useFormContext();
+	const { register } = useFormContext<OmnichannelPreferencesPageFields>();
 
 	const hasLicense = useHasLicenseModule('livechat-enterprise');
 	const canSendTranscriptPDF = usePermission('request-pdf-transcript');

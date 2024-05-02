@@ -1,28 +1,28 @@
 import { Sidebar, IconButton } from '@rocket.chat/fuselage';
-import { useMutableCallback, usePrefersReducedMotion } from '@rocket.chat/fuselage-hooks';
-import type { VFC } from 'react';
+import { useEffectEvent, usePrefersReducedMotion } from '@rocket.chat/fuselage-hooks';
+import type { ReactNode } from 'react';
 import React, { memo, useState } from 'react';
 
 type MediumProps = {
-	title: React.ReactNode;
-	titleIcon?: React.ReactNode;
-	avatar: React.ReactNode | boolean;
+	title: ReactNode;
+	titleIcon?: ReactNode;
+	avatar: ReactNode | boolean;
 	icon?: string;
-	actions?: React.ReactNode;
+	actions?: ReactNode;
 	href?: string;
 	unread?: boolean;
-	menu?: () => React.ReactNode;
-	badges?: React.ReactNode;
+	menu?: ReactNode;
+	badges?: ReactNode;
 	selected?: boolean;
 	menuOptions?: any;
 };
 
-const Medium: VFC<MediumProps> = ({ icon, title = '', avatar, actions, href, badges, unread, menu, ...props }) => {
+const Medium = ({ icon, title = '', avatar, actions, href, badges, unread, menu, ...props }: MediumProps) => {
 	const [menuVisibility, setMenuVisibility] = useState(!!window.DISABLE_ANIMATION);
 
 	const isReduceMotionEnabled = usePrefersReducedMotion();
 
-	const handleMenu = useMutableCallback((e) => {
+	const handleMenu = useEffectEvent((e) => {
 		setMenuVisibility(e.target.offsetWidth > 0 && Boolean(menu));
 	});
 	const handleMenuEvent = {
@@ -42,7 +42,7 @@ const Medium: VFC<MediumProps> = ({ icon, title = '', avatar, actions, href, bad
 				{badges && <Sidebar.Item.Badge>{badges}</Sidebar.Item.Badge>}
 				{menu && (
 					<Sidebar.Item.Menu {...handleMenuEvent}>
-						{menuVisibility ? menu() : <IconButton tabIndex={-1} aria-hidden mini rcx-sidebar-item__menu icon='kebab' />}
+						{menuVisibility ? menu : <IconButton tabIndex={-1} aria-hidden mini rcx-sidebar-item__menu icon='kebab' />}
 					</Sidebar.Item.Menu>
 				)}
 			</Sidebar.Item.Content>

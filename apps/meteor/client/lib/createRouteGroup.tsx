@@ -16,8 +16,15 @@ type RouteNamesOf<TGroupName extends GroupName> = Extract<
 				: never]: never;
 	  }
 	| `${GroupName}-index`,
-	RouteName
+	keyof IRouterPaths
 >;
+
+type RouterPathsItem = {
+	pattern: string;
+	pathname: string;
+};
+
+type AssertRouterPathItem<T> = Extract<T, RouterPathsItem>;
 
 type TrimPrefix<T extends string, P extends string> = T extends `${P}${infer U}` ? U : T;
 
@@ -41,14 +48,14 @@ export const createRouteGroup = <TGroupName extends GroupName>(
 	]);
 
 	return <TRouteName extends RouteNamesOf<TGroupName>>(
-		path: TrimPrefix<IRouterPaths[TRouteName]['pattern'], GroupPrefix<TGroupName>>,
+		path: TrimPrefix<AssertRouterPathItem<IRouterPaths[TRouteName]>['pattern'], GroupPrefix<TGroupName>>,
 		{
 			name,
 			component: RouteComponent,
 			props,
 			ready = true,
 		}: {
-			name: TRouteName;
+			name: TRouteName & RouteNamesOf<any>;
 			component: ElementType;
 			props?: Record<string, unknown>;
 			ready?: boolean;

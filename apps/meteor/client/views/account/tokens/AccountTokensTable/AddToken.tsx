@@ -33,7 +33,7 @@ const AddToken = ({ reload }: { reload: () => void }): ReactElement => {
 	);
 
 	const handleAddToken = useCallback(
-		async ({ name: tokenName, bypassTwoFactor }) => {
+		async ({ name: tokenName, bypassTwoFactor }: { name: string; bypassTwoFactor: string }) => {
 			try {
 				const token = await createTokenFn({ tokenName, bypassTwoFactor: bypassTwoFactor === 'bypass' });
 

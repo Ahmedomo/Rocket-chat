@@ -1,7 +1,7 @@
 import { FieldLabel, FieldRow, FieldHint, Flex, InputBox, Margins, TextInput, Select, Field } from '@rocket.chat/fuselage';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
 import { useTranslation } from '@rocket.chat/ui-contexts';
-import type { ReactElement } from 'react';
+import type { FormEvent, Key, ReactElement } from 'react';
 import React, { useCallback } from 'react';
 
 import ResetSettingButton from '../ResetSettingButton';
@@ -32,15 +32,15 @@ function ColorSettingInput({
 	const t = useTranslation();
 
 	const handleChange = useCallback(
-		(event) => {
+		(event: FormEvent<HTMLInputElement>) => {
 			onChangeValue?.(event.currentTarget.value);
 		},
 		[onChangeValue],
 	);
 
 	const handleEditorTypeChange = useCallback(
-		(value) => {
-			onChangeEditor?.(value);
+		(value: Key) => {
+			onChangeEditor?.(String(value));
 		},
 		[onChangeEditor],
 	);

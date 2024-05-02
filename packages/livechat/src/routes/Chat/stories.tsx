@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import type { Meta, Story } from '@storybook/preact';
+import type { Meta, Story } from '@storybook/react';
 import type { ComponentProps } from 'preact';
 
 import { avatarResolver, beepAudio, screenDecorator } from '../../../.storybook/helpers';

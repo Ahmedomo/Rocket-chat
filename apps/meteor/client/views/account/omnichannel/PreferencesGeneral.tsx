@@ -5,9 +5,11 @@ import type { ReactElement } from 'react';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import type { OmnichannelPreferencesPageFields } from './OmnichannelPreferencesPage';
+
 export const PreferencesGeneral = (): ReactElement => {
 	const t = useTranslation();
-	const { register } = useFormContext();
+	const { register } = useFormContext<OmnichannelPreferencesPageFields>();
 	const omnichannelHideAfterClosing = useUniqueId();
 
 	return (

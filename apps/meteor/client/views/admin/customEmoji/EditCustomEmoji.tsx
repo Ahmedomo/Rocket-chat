@@ -12,7 +12,7 @@ import {
 	IconButton,
 } from '@rocket.chat/fuselage';
 import { useSetModal, useToastMessageDispatch, useAbsoluteUrl, useTranslation } from '@rocket.chat/ui-contexts';
-import type { FC, ChangeEvent } from 'react';
+import type { FC, ChangeEvent, FormEvent } from 'react';
 import React, { useCallback, useState, useMemo, useEffect } from 'react';
 
 import { ContextualbarScrollableContent, ContextualbarFooter } from '../../../components/Contextualbar';
@@ -113,15 +113,15 @@ const EditCustomEmoji: FC<EditCustomEmojiProps> = ({ close, onChange, data, ...p
 			setModal(null);
 		};
 
-		setModal(() => (
+		setModal(
 			<GenericModal variant='danger' onConfirm={handleDelete} onCancel={handleCancel} onClose={handleCancel} confirmText={t('Delete')}>
 				{t('Custom_Emoji_Delete_Warning')}
-			</GenericModal>
-		));
+			</GenericModal>,
+		);
 	}, [setModal, deleteAction, _id, dispatchToastMessage, t, onChange, close]);
 
 	const handleChangeAliases = useCallback(
-		(e) => {
+		(e: FormEvent<HTMLInputElement>) => {
 			if (e.currentTarget.value !== name) {
 				setErrors((prevState) => ({ ...prevState, aliases: false }));
 			}

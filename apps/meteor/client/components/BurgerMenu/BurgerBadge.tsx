@@ -1,13 +1,15 @@
 import { css } from '@rocket.chat/css-in-js';
 import { Box, Badge } from '@rocket.chat/fuselage';
-import type { ReactElement } from 'react';
+import type { ReactElement, ReactNode } from 'react';
 import React from 'react';
 
-const BurgerBadge = ({ children }: { children?: unknown }): ReactElement => (
+type BurgerBadgeProps = { children?: ReactNode };
+
+const BurgerBadge = ({ children }: BurgerBadgeProps): ReactElement => (
 	<Box
 		className={css`
 			position: absolute;
-			zindex: 3;
+			z-index: 3;
 			top: -5px;
 			right: -5px;
 		`}

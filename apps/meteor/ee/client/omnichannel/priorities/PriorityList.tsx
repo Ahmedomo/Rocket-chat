@@ -10,13 +10,13 @@ import {
 	ContextualbarScrollableContent,
 	ContextualbarDialog,
 } from '../../../../client/components/Contextualbar';
-import type { PriorityFormData } from './PriorityEditForm';
+import type { PriorityEditFormFields } from './PriorityEditForm';
 import PriorityEditFormWithData from './PriorityEditFormWithData';
 
 type PriorityListProps = {
 	context: 'edit';
 	priorityId: string;
-	onSave: (data: PriorityFormData) => Promise<void>;
+	onSave: (data: PriorityEditFormFields) => Promise<void>;
 	onClose: () => void;
 };
 

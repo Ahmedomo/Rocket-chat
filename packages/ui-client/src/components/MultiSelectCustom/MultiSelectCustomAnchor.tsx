@@ -2,7 +2,7 @@ import { css } from '@rocket.chat/css-in-js';
 import { Box, Button, Icon, Palette } from '@rocket.chat/fuselage';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
 import { useTranslation } from '@rocket.chat/ui-contexts';
-import type { ComponentProps } from 'react';
+import type { ComponentProps, PropsWithoutRef } from 'react';
 import { forwardRef } from 'react';
 
 type MultiSelectCustomAnchorProps = {
@@ -12,7 +12,7 @@ type MultiSelectCustomAnchorProps = {
 	selectedOptionsTitle: TranslationKey;
 	selectedOptionsCount: number;
 	maxCount: number;
-} & ComponentProps<typeof Button>;
+} & PropsWithoutRef<ComponentProps<typeof Button>>;
 
 const MultiSelectCustomAnchor = forwardRef<HTMLElement, MultiSelectCustomAnchorProps>(function MultiSelectCustomAnchor(
 	{ onClick, collapsed, selectedOptionsCount, selectedOptionsTitle, defaultTitle, maxCount, ...props },

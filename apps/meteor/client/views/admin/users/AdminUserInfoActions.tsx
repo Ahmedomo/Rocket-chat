@@ -118,7 +118,7 @@ const AdminUserInfoActions = ({
 				flexShrink={0}
 				key='menu'
 				renderItem={({ label: { label, icon }, ...props }): ReactElement => <Option label={label} title={label} icon={icon} {...props} />}
-				options={menuOptions}
+				options={menuOptions as any} // FIXME
 			/>
 		);
 	}, [menuOptions]);

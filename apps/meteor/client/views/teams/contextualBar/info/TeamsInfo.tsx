@@ -110,7 +110,7 @@ const TeamsInfo = ({
 				maxHeight='initial'
 				secondary
 				renderItem={({ label: { label, icon }, ...props }): ReactElement => <Option {...props} label={label} icon={icon} />}
-				options={menuOptions}
+				options={menuOptions as any} // FIXME
 			/>
 		);
 	}, [menuOptions]);

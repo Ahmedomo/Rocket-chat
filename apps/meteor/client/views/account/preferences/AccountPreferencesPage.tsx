@@ -2,7 +2,6 @@ import { ButtonGroup, Button, Box, Accordion } from '@rocket.chat/fuselage';
 import { useUniqueId } from '@rocket.chat/fuselage-hooks';
 import { useToastMessageDispatch, useSetting, useTranslation, useEndpoint } from '@rocket.chat/ui-contexts';
 import { useMutation } from '@tanstack/react-query';
-import type { ReactElement } from 'react';
 import React from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -19,19 +18,19 @@ import PreferencesUserPresenceSection from './PreferencesUserPresenceSection';
 import type { AccountPreferencesData } from './useAccountPreferencesValues';
 import { useAccountPreferencesValues } from './useAccountPreferencesValues';
 
-const AccountPreferencesPage = (): ReactElement => {
+const AccountPreferencesPage = () => {
 	const t = useTranslation();
 	const dispatchToastMessage = useToastMessageDispatch();
 	const dataDownloadEnabled = useSetting('UserData_EnableDownload');
 	const preferencesValues = useAccountPreferencesValues();
 
-	const methods = useForm({ defaultValues: preferencesValues });
+	const form = useForm<AccountPreferencesData>({ defaultValues: preferencesValues });
 	const {
 		handleSubmit,
 		reset,
 		watch,
 		formState: { isDirty, dirtyFields },
-	} = methods;
+	} = form;
 
 	const currentData = watch();
 
@@ -77,7 +76,7 @@ const AccountPreferencesPage = (): ReactElement => {
 		<Page>
 			<PageHeader title={t('Preferences')} />
 			<PageScrollableContentWithShadow>
-				<FormProvider {...methods}>
+				<FormProvider {...form}>
 					<Box id={preferencesFormId} is='form' maxWidth='x600' w='full' alignSelf='center' onSubmit={handleSubmit(handleSaveData)}>
 						<Accordion>
 							<PreferencesLocalizationSection />

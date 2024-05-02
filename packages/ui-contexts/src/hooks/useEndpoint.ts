@@ -11,11 +11,11 @@ export type EndpointFunction<TMethod extends Method, TPathPattern extends PathPa
 	? (params?: OperationParams<TMethod, TPathPattern>) => Promise<Serialized<OperationResult<TMethod, TPathPattern>>>
 	: (params: OperationParams<TMethod, TPathPattern>) => Promise<Serialized<OperationResult<TMethod, TPathPattern>>>;
 
-export function useEndpoint<TMethod extends Method, TPathPattern extends PathPattern>(
-	method: TMethod,
-	pathPattern: TPathPattern,
-	...[keys]: undefined extends UrlParams<TPathPattern> ? [keys?: UrlParams<TPathPattern>] : [keys: UrlParams<TPathPattern>]
-): EndpointFunction<TMethod, TPathPattern> {
+export function useEndpoint<
+	TMethod extends Method,
+	TPathPattern extends PathPattern,
+	TKeys extends undefined extends UrlParams<TPathPattern> ? [keys?: UrlParams<TPathPattern>] : [keys: UrlParams<TPathPattern>],
+>(method: TMethod, pathPattern: TPathPattern, ...[keys]: TKeys): EndpointFunction<TMethod, TPathPattern> {
 	const { callEndpoint } = useContext(ServerContext);
 	const keysRef = useRef(keys);
 	keysRef.current = keys;

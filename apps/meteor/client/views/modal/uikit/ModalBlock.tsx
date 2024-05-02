@@ -3,7 +3,7 @@ import { useUniqueId } from '@rocket.chat/fuselage-hooks';
 import { UiKitComponent, UiKitModal, modalParser } from '@rocket.chat/fuselage-ui-kit';
 import * as UiKit from '@rocket.chat/ui-kit';
 import type { FormEventHandler, ReactElement } from 'react';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react';
 import { FocusScope } from 'react-aria';
 
 import { getURL } from '../../../../app/utils/client/getURL';
@@ -39,7 +39,7 @@ type ModalBlockParams = {
 	view: UiKit.ModalView;
 	errors: any;
 	appId: string;
-	onSubmit: FormEventHandler<HTMLElement>;
+	onSubmit: FormEventHandler<HTMLFormElement>;
 	onClose: () => void;
 	onCancel: FormEventHandler<HTMLElement>;
 };
@@ -82,12 +82,14 @@ const ModalBlock = ({ view, errors, onSubmit, onClose, onCancel }: ModalBlockPar
 		[previousFocus],
 	);
 
+	const formId = useId();
+
 	const handleKeyDown = useCallback(
-		(event) => {
+		(event: KeyboardEvent) => {
 			switch (event.keyCode) {
 				case KeyboardCode.get('ENTER'):
-					if (event?.target?.nodeName !== 'TEXTAREA') {
-						return onSubmit(event);
+					if ((event?.target as Node)?.nodeName !== 'TEXTAREA') {
+						return (document.getElementById(formId) as HTMLFormElement).submit();
 					}
 					return;
 				case KeyboardCode.get('ESC'):
@@ -123,7 +125,7 @@ const ModalBlock = ({ view, errors, onSubmit, onClose, onCancel }: ModalBlockPar
 					}
 			}
 		},
-		[onClose, onSubmit],
+		[formId, onClose],
 	);
 
 	useEffect(() => {
@@ -139,7 +141,7 @@ const ModalBlock = ({ view, errors, onSubmit, onClose, onCancel }: ModalBlockPar
 			return false;
 		};
 
-		const ignoreIfNotContains = (e: Event) => {
+		const ignoreIfNotContains = (e: KeyboardEvent) => {
 			if (e.target !== element) {
 				return;
 			}
@@ -168,7 +170,7 @@ const ModalBlock = ({ view, errors, onSubmit, onClose, onCancel }: ModalBlockPar
 						<Modal.Close tabIndex={-1} onClick={onClose} />
 					</Modal.Header>
 					<Modal.Content>
-						<Box is='form' method='post' action='#' onSubmit={onSubmit}>
+						<Box is='form' method='post' action='#' id={formId} onSubmit={onSubmit}>
 							<UiKitComponent render={UiKitModal} blocks={view.blocks} />
 						</Box>
 					</Modal.Content>
@@ -180,7 +182,7 @@ const ModalBlock = ({ view, errors, onSubmit, onClose, onCancel }: ModalBlockPar
 								</Button>
 							)}
 							{view.submit && (
-								<Button {...getButtonStyle(view.submit)} onClick={onSubmit}>
+								<Button {...getButtonStyle(view.submit)} type='submit' form={formId}>
 									{modalParser.text(view.submit.text, UiKit.BlockContext.NONE, 1)}
 								</Button>
 							)}

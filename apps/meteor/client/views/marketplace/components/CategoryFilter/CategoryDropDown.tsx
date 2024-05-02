@@ -21,7 +21,7 @@ const CategoryDropDown = ({ categories, onSelected, selectedCategories, ...props
 	const [collapsed, toggleCollapsed] = useToggle(false);
 
 	const onClose = useCallback(
-		(e) => {
+		(e: MouseEvent) => {
 			if (isValidReference(reference, e)) {
 				toggleCollapsed(false);
 				return;

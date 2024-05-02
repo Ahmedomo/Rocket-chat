@@ -8,7 +8,7 @@ import type { RadioDropDownGroup } from '../../definitions/RadioDropDownDefiniti
 type RadioDropdownAnchorProps = {
 	onClick: (forcedValue?: React.SetStateAction<boolean> | undefined) => void;
 	group: RadioDropDownGroup;
-} & Omit<ComponentProps<typeof Button>, 'onClick'>;
+} & Omit<ComponentProps<typeof Button>, 'ref' | 'onClick'>;
 
 const RadioDownAnchor = forwardRef<HTMLElement, RadioDropdownAnchorProps>(function SortDropDownAnchor({ onClick, group, ...props }, ref) {
 	const selected = group?.items.find((item) => item.checked)?.label;

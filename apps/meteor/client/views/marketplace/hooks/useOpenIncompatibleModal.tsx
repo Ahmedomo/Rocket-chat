@@ -1,7 +1,9 @@
+import type { App } from '@rocket.chat/core-typings';
 import { useSetModal } from '@rocket.chat/ui-contexts';
 import React, { useCallback } from 'react';
 
 import IframeModal from '../IframeModal';
+import type { Actions } from '../helpers';
 import { handleAPIError } from '../helpers/handleAPIError';
 import { useAppsOrchestration } from './useAppsOrchestration';
 
@@ -15,7 +17,7 @@ export const useOpenIncompatibleModal = () => {
 	}
 
 	return useCallback(
-		async (app, actionName, cancelAction) => {
+		async (app: App, actionName: Actions | undefined, cancelAction: () => void) => {
 			const handleCancel = () => {
 				setModal(null);
 				cancelAction();
@@ -27,7 +29,7 @@ export const useOpenIncompatibleModal = () => {
 			};
 
 			try {
-				const incompatibleData = await appsOrchestrator.buildIncompatibleExternalUrl(app.id, app.marketplaceVersion, actionName);
+				const incompatibleData = await appsOrchestrator.buildIncompatibleExternalUrl(app.id, app.marketplaceVersion, actionName ?? '');
 				setModal(<IframeModal url={incompatibleData.url} cancel={handleCancel} confirm={handleConfirm} />);
 			} catch (e) {
 				handleAPIError(e);

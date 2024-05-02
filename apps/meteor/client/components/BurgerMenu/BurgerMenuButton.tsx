@@ -9,7 +9,7 @@ import BurgerIcon from './BurgerIcon';
 
 type BurgerMenuButtonProps = {
 	open?: boolean;
-	badge?: number | unknown;
+	badge?: boolean | number | string;
 	onClick: () => void;
 };
 

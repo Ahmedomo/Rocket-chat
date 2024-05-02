@@ -12,7 +12,7 @@ type ModerationFilterProps = {
 const ModerationFilter = ({ setText, setDateRange }: ModerationFilterProps) => {
 	const t = useTranslation();
 
-	const handleChange = useCallback(({ text }): void => setText(text), [setText]);
+	const handleChange = useCallback(({ text }: { text: string }): void => setText(text), [setText]);
 
 	return (
 		<FilterByText shouldAutoFocus placeholder={t('Search')} onChange={handleChange}>

@@ -5,11 +5,13 @@ import { useLanguages, useTranslation } from '@rocket.chat/ui-contexts';
 import React, { useMemo } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesLocalizationSection = () => {
 	const t = useTranslation();
 	const languages = useLanguages();
 
-	const { control } = useFormContext();
+	const { control } = useFormContext<AccountPreferencesData>();
 
 	const languageOptions = useMemo(() => {
 		const mapOptions: SelectOption[] = languages.map(({ key, name }) => [key, name]);

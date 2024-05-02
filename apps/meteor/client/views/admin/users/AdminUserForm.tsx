@@ -95,7 +95,7 @@ const UserForm = ({ userData, onReload, ...props }: AdminUserFormProps) => {
 
 	const availableRoles: SelectOption[] = roleData?.roles.map(({ _id, name, description }) => [_id, description || name]) || [];
 
-	const goToUser = useCallback((id) => router.navigate(`/admin/users/info/${id}`), [router]);
+	const goToUser = useCallback((id: IUser['_id']) => router.navigate(`/admin/users/info/${id}`), [router]);
 
 	const {
 		control,
@@ -413,8 +413,9 @@ const UserForm = ({ userData, onReload, ...props }: AdminUserFormProps) => {
 					<Field>
 						<FieldLabel htmlFor={rolesId}>{t('Roles')}</FieldLabel>
 						<FieldRow>
-							{roleError && <Callout>{roleError}</Callout>}
-							{!roleError && (
+							{roleError ? (
+								<Callout>{String(roleError)}</Callout>
+							) : (
 								<Controller
 									control={control}
 									name='roles'

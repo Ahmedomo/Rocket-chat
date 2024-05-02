@@ -16,13 +16,28 @@ const checkIsOptionsValid = (value: string) => {
 	return value.split(',').every((v) => /^[a-zA-Z0-9-_ ]+$/.test(v));
 };
 
+export type CustomFieldsAdditionalFormFields = {
+	field: string;
+	label: string;
+	scope: 'room' | 'visitor';
+	visibility: boolean;
+	searchable: boolean;
+	regexp: string;
+	type: string;
+	required: boolean;
+	defaultValue: string;
+	options: string;
+	public: boolean;
+};
+
 const CustomFieldsAdditionalForm = ({ className }: { className?: ComponentProps<typeof Field>['className'] }) => {
 	const t = useTranslation();
 	const {
 		control,
 		watch,
 		formState: { errors },
-	} = useFormContext();
+	} = useFormContext<CustomFieldsAdditionalFormFields>();
+
 	const hasLicense = useHasLicenseModule('livechat-enterprise');
 
 	const { visibility, type } = watch();

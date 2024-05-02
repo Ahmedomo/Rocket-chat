@@ -1,5 +1,5 @@
 import { Box } from '@rocket.chat/fuselage';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import { useSetModal, useTranslation } from '@rocket.chat/ui-contexts';
 import type { FC, MouseEvent } from 'react';
 import React from 'react';
@@ -16,7 +16,7 @@ type AnnouncementParams = {
 const Announcement: FC<AnnouncementParams> = ({ announcement, announcementDetails }) => {
 	const t = useTranslation();
 	const setModal = useSetModal();
-	const closeModal = useMutableCallback(() => setModal(null));
+	const closeModal = useEffectEvent(() => setModal(null));
 	const handleClick = (e: MouseEvent<HTMLAnchorElement>): void => {
 		if ((e.target as HTMLAnchorElement).href) {
 			return;

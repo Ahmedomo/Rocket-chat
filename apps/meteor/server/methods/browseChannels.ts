@@ -1,5 +1,5 @@
 import { Team } from '@rocket.chat/core-services';
-import type { IRoom, IUser } from '@rocket.chat/core-typings';
+import type { IRoom, IUser, IUserEmail } from '@rocket.chat/core-typings';
 import { Rooms, Users, Subscriptions } from '@rocket.chat/models';
 import { escapeRegExp } from '@rocket.chat/string-helpers';
 import type { ServerMethods } from '@rocket.chat/ui-contexts';
@@ -177,6 +177,19 @@ const getTeams = async (
 	};
 };
 
+type FederatedUser =
+	| IUser
+	| {
+			_id?: string;
+			username?: string;
+			name?: string;
+			bio?: string;
+			nickname?: string;
+			emails?: IUserEmail[];
+			federation?: unknown;
+			isRemote: true;
+	  };
+
 const findUsers = async ({
 	text,
 	sort,
@@ -210,19 +223,6 @@ const findUsers = async ({
 			avatarETag: 1,
 		},
 	};
-
-	type FederatedUser =
-		| IUser
-		| {
-				_id?: string;
-				username?: string;
-				name?: string;
-				bio?: string;
-				nickname?: string;
-				emails?: string;
-				federation?: unknown;
-				isRemote: true;
-		  };
 
 	if (workspace === 'all') {
 		const { cursor, totalCount } = Users.findPaginatedByActiveUsersExcept<FederatedUser>(text, [], options, searchFields);
@@ -320,7 +320,13 @@ declare module '@rocket.chat/ui-contexts' {
 			page?: number;
 			offset?: number;
 			limit?: number;
-		}) => Promise<unknown>;
+		}) => Promise<
+			| {
+					total: number;
+					results: (IRoom & { belongsTo: string })[] | (IRoom & { roomsCount?: number })[] | FederatedUser[];
+			  }
+			| undefined
+		>;
 	}
 }
 

@@ -21,7 +21,7 @@ type mappedDayTime = {
 	open: boolean;
 };
 
-export type BusinessHoursFormData = {
+export type BusinessHoursFields = {
 	name: string;
 	timezoneName: string;
 	daysOpen: string[];
@@ -43,7 +43,7 @@ const BusinessHoursForm = ({ type }: { type?: 'default' | 'custom' }) => {
 	const timeZonesOptions: SelectOption[] = useMemo(() => timeZones.map((name) => [name, t(name as TranslationKey)]), [t, timeZones]);
 	const daysOptions: SelectOption[] = useMemo(() => DAYS_OF_WEEK.map((day) => [day, t(day as TranslationKey)]), [t]);
 
-	const { watch, control } = useFormContext<BusinessHoursFormData>();
+	const { watch, control } = useFormContext<BusinessHoursFields>();
 	const { daysTime } = watch();
 	const { fields: daysTimeFields, replace } = useFieldArray({ control, name: 'daysTime' });
 

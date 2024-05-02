@@ -2,7 +2,7 @@ import type { IDiscussionMessage, IUser } from '@rocket.chat/core-typings';
 import { Box, Icon, TextInput, Callout, Throbber } from '@rocket.chat/fuselage';
 import { useResizeObserver, useAutoFocus } from '@rocket.chat/fuselage-hooks';
 import { useSetting, useTranslation } from '@rocket.chat/ui-contexts';
-import type { RefObject } from 'react';
+import type { FormEventHandler, MouseEvent, RefObject } from 'react';
 import React, { useCallback } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -27,7 +27,7 @@ type DiscussionsListProps = {
 	error: unknown;
 	userId: IUser['_id'];
 	text: string;
-	onChangeFilter: (e: unknown) => void;
+	onChangeFilter: FormEventHandler<HTMLInputElement>;
 };
 
 function DiscussionsList({
@@ -45,8 +45,9 @@ function DiscussionsList({
 	const showRealNames = useSetting<boolean>('UI_Use_Real_Name') || false;
 	const inputRef = useAutoFocus(true);
 
-	const onClick = useCallback((e) => {
+	const onClick = useCallback((e: MouseEvent<HTMLElement>) => {
 		const { drid } = e.currentTarget.dataset;
+		if (!drid) throw new Error('missing discussion ID');
 		goToRoomById(drid);
 	}, []);
 

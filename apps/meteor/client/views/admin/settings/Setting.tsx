@@ -69,7 +69,7 @@ function Setting({ className = undefined, settingId, sectionChanged }: SettingPr
 	}, [(setting as ISettingColor).editor]);
 
 	const onChangeValue = useCallback(
-		(value) => {
+		(value: SettingValue) => {
 			setValue(value);
 			update({ value });
 		},
@@ -77,7 +77,7 @@ function Setting({ className = undefined, settingId, sectionChanged }: SettingPr
 	);
 
 	const onChangeEditor = useCallback(
-		(editor) => {
+		(editor: SettingEditor) => {
 			setEditor(editor);
 			update({ editor });
 		},

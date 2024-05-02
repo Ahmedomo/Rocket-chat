@@ -1,10 +1,16 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-		"rootDir": "./src",
+    "rootDir": "./src",
     "module": "ESNext",
     "outDir": "./dist/esm"
   },
-	"include": ["src"],
-  "exclude": ["node_modules", "dist", "src/**/*.stories.tsx", ".storybook/**/*"]
+  "include": ["src"],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "src/**/*.stories.tsx",
+    "src/**/*.spec.tsx",
+    ".storybook/**/*"
+  ]
 }

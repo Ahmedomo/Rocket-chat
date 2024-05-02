@@ -1,5 +1,5 @@
 import type { IRoom, Serialized } from '@rocket.chat/core-typings';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import type { ReactElement } from 'react';
 import React, { useState, useCallback, useMemo } from 'react';
 
@@ -27,7 +27,7 @@ const LeaveTeamModal = ({ rooms, onCancel, onConfirm }: LeaveTeamModalProps): Re
 	const handleContinue = useCallback(() => setStep(LEAVE_TEAM_STEPS.CONFIRM_LEAVE), []);
 	const handleReturn = useCallback(() => setStep(LEAVE_TEAM_STEPS.LIST_ROOMS), []);
 
-	const onChangeRoomSelection = useCallback((room) => {
+	const onChangeRoomSelection = useCallback((room: Serialized<IRoom> & { isLastOwner?: boolean }) => {
 		setSelectedRooms((selectedRooms) => {
 			if (selectedRooms[room._id]) {
 				delete selectedRooms[room._id];
@@ -37,7 +37,7 @@ const LeaveTeamModal = ({ rooms, onCancel, onConfirm }: LeaveTeamModalProps): Re
 		});
 	}, []);
 
-	const onToggleAllRooms = useMutableCallback(() => {
+	const onToggleAllRooms = useEffectEvent(() => {
 		setSelectedRooms((selectedRooms) => {
 			if (Object.values(selectedRooms).filter(Boolean).length === 0) {
 				return Object.fromEntries(rooms.filter(({ isLastOwner }) => !isLastOwner).map((room) => [room._id, room]));

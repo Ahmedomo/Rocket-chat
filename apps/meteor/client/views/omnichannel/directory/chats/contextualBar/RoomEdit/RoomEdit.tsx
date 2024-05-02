@@ -15,6 +15,14 @@ import { FormSkeleton } from '../../../components/FormSkeleton';
 import { useCustomFieldsMetadata } from '../../../hooks/useCustomFieldsMetadata';
 import { useSlaPolicies } from '../../../hooks/useSlaPolicies';
 
+type RoomEditFields = {
+	topic: string;
+	tags: string[];
+	livechatData: any;
+	slaId: string;
+	priorityId: string;
+};
+
 type RoomEditProps = {
 	room: Serialized<IOmnichannelRoom>;
 	visitor: Serialized<ILivechatVisitor>;
@@ -23,14 +31,15 @@ type RoomEditProps = {
 	onClose: () => void;
 };
 
-const ROOM_INTIAL_VALUE = {
+const ROOM_INTIAL_VALUE: RoomEditFields = {
 	topic: '',
 	tags: [],
 	livechatData: {},
 	slaId: '',
+	priorityId: '',
 };
 
-const getInitialValuesRoom = (room: Serialized<IOmnichannelRoom>) => {
+const getInitialValuesRoom = (room: Serialized<IOmnichannelRoom>): RoomEditFields => {
 	const { topic, tags, livechatData, slaId, priorityId } = room ?? ROOM_INTIAL_VALUE;
 
 	return {
@@ -62,7 +71,7 @@ function RoomEdit({ room, visitor, reload, reloadInfo, onClose }: RoomEditProps)
 		control,
 		formState: { isDirty: isFormDirty, isValid: isFormValid, isSubmitting },
 		handleSubmit,
-	} = useForm({
+	} = useForm<RoomEditFields>({
 		mode: 'onChange',
 		defaultValues: getInitialValuesRoom(room),
 	});
@@ -72,7 +81,7 @@ function RoomEdit({ room, visitor, reload, reloadInfo, onClose }: RoomEditProps)
 	const { field: priorityIdField } = useController({ control, name: 'priorityId' });
 
 	const handleSave = useCallback(
-		async (data) => {
+		async (data: RoomEditFields) => {
 			if (!isFormValid) {
 				return;
 			}

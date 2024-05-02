@@ -9,7 +9,7 @@ import { Page, PageHeader, PageContent } from '../../../../client/components/Pag
 import { useOmnichannelPriorities } from '../hooks/useOmnichannelPriorities';
 import { PrioritiesResetModal } from './PrioritiesResetModal';
 import { PrioritiesTable } from './PrioritiesTable';
-import type { PriorityFormData } from './PriorityEditForm';
+import type { PriorityEditFormFields } from './PriorityEditForm';
 import PriorityList from './PriorityList';
 
 type PrioritiesPageProps = {
@@ -63,7 +63,7 @@ export const PrioritiesPage = ({ priorityId, context }: PrioritiesPageProps): Re
 		prioritiesRoute.push({});
 	};
 
-	const onSavePriority = async ({ reset, ...payload }: PriorityFormData): Promise<void> => {
+	const onSavePriority = async ({ reset, ...payload }: PriorityEditFormFields): Promise<void> => {
 		await savePriority(reset ? { reset } : payload);
 		await queryClient.invalidateQueries(['/v1/livechat/priorities']);
 

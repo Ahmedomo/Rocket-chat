@@ -1,5 +1,5 @@
 import type { IRoom, Serialized } from '@rocket.chat/core-typings';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import type { FC } from 'react';
 import React, { useState, useCallback } from 'react';
 
@@ -29,12 +29,12 @@ const BaseConvertToChannelModal: FC<BaseConvertToChannelModalProps> = ({
 	const [step, setStep] = useState(currentStep);
 	const [selectedRooms, setSelectedRooms] = useState<{ [key: string]: Serialized<IRoom> }>({});
 
-	const onContinue = useMutableCallback(() => setStep(STEPS.CONFIRM_CONVERT));
-	const onReturn = useMutableCallback(() => setStep(STEPS.LIST_ROOMS));
+	const onContinue = useEffectEvent(() => setStep(STEPS.CONFIRM_CONVERT));
+	const onReturn = useEffectEvent(() => setStep(STEPS.LIST_ROOMS));
 
 	const eligibleRooms = rooms;
 
-	const onChangeRoomSelection = useCallback((room) => {
+	const onChangeRoomSelection = useCallback((room: Serialized<IRoom>) => {
 		setSelectedRooms((selectedRooms) => {
 			if (selectedRooms[room._id]) {
 				delete selectedRooms[room._id];
@@ -44,7 +44,7 @@ const BaseConvertToChannelModal: FC<BaseConvertToChannelModalProps> = ({
 		});
 	}, []);
 
-	const onToggleAllRooms = useMutableCallback(() => {
+	const onToggleAllRooms = useEffectEvent(() => {
 		if (Object.values(selectedRooms).filter(Boolean).length === 0 && eligibleRooms) {
 			return setSelectedRooms(Object.fromEntries(eligibleRooms.map((room) => [room._id, room])));
 		}

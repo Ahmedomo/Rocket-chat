@@ -1,4 +1,4 @@
-import type { IRoom } from '@rocket.chat/core-typings';
+import type { IRoom, Serialized } from '@rocket.chat/core-typings';
 import { Pagination, States, StatesIcon, StatesTitle, StatesActions, StatesAction } from '@rocket.chat/fuselage';
 import { useMediaQuery, useDebouncedValue } from '@rocket.chat/fuselage-hooks';
 import { useRoute, useTranslation, useEndpoint } from '@rocket.chat/ui-contexts';
@@ -60,7 +60,18 @@ const TeamsTable = () => {
 
 	const getDirectoryData = useEndpoint('GET', '/v1/directory');
 	const query = useDirectoryQuery({ text: debouncedText, current, itemsPerPage }, [sortBy, sortDirection], 'teams');
-	const { data, isFetched, isLoading, isError, refetch } = useQuery(['getDirectoryData', query], () => getDirectoryData(query));
+	const { data, isFetched, isLoading, isError, refetch } = useQuery(
+		['getDirectoryData', query],
+		() =>
+			getDirectoryData(query) as Promise<
+				Serialized<{
+					count: number;
+					offset: number;
+					total: number;
+					result: (IRoom & { roomsCount?: number })[];
+				}>
+			>,
+	);
 
 	const onClick = useMemo(
 		() => (name: IRoom['name'], type: IRoom['t']) => (e: React.KeyboardEvent | React.MouseEvent) => {
@@ -90,7 +101,7 @@ const TeamsTable = () => {
 							{data.result.map((team) => (
 								<TeamsTableRow
 									key={team._id}
-									team={team as unknown as IRoom & { roomsCount: number }}
+									team={team as Serialized<IRoom & { roomsCount?: number }>}
 									onClick={onClick}
 									mediaQuery={mediaQuery}
 								/>

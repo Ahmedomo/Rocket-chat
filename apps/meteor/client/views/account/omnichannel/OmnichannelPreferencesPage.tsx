@@ -8,9 +8,10 @@ import { Page, PageHeader, PageScrollableContentWithShadow, PageFooter } from '.
 import PreferencesConversationTranscript from './PreferencesConversationTranscript';
 import { PreferencesGeneral } from './PreferencesGeneral';
 
-type FormData = {
+export type OmnichannelPreferencesPageFields = {
 	omnichannelTranscriptPDF: boolean;
 	omnichannelTranscriptEmail: boolean;
+	omnichannelHideConversationAfterClosing: boolean;
 };
 
 const OmnichannelPreferencesPage = (): ReactElement => {
@@ -21,7 +22,7 @@ const OmnichannelPreferencesPage = (): ReactElement => {
 	const omnichannelTranscriptEmail = useUserPreference<boolean>('omnichannelTranscriptEmail') ?? false;
 	const omnichannelHideConversationAfterClosing = useUserPreference<boolean>('omnichannelHideConversationAfterClosing') ?? true;
 
-	const methods = useForm({
+	const form = useForm<OmnichannelPreferencesPageFields>({
 		defaultValues: { omnichannelTranscriptPDF, omnichannelTranscriptEmail, omnichannelHideConversationAfterClosing },
 	});
 
@@ -29,11 +30,11 @@ const OmnichannelPreferencesPage = (): ReactElement => {
 		handleSubmit,
 		formState: { isDirty },
 		reset,
-	} = methods;
+	} = form;
 
 	const saveFn = useEndpoint('POST', '/v1/users.setPreferences');
 
-	const handleSave = async (data: FormData) => {
+	const handleSave = async (data: OmnichannelPreferencesPageFields) => {
 		try {
 			await saveFn({ data });
 			reset(data);
@@ -49,7 +50,7 @@ const OmnichannelPreferencesPage = (): ReactElement => {
 			<PageScrollableContentWithShadow is='form' onSubmit={handleSubmit(handleSave)}>
 				<Box maxWidth='x600' w='full' alignSelf='center'>
 					<Accordion>
-						<FormProvider {...methods}>
+						<FormProvider {...form}>
 							<PreferencesGeneral />
 							<PreferencesConversationTranscript />
 						</FormProvider>

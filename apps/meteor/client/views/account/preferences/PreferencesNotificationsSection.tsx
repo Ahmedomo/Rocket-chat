@@ -8,6 +8,7 @@ import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
 import { KonchatNotification } from '../../../../app/ui/client/lib/KonchatNotification';
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
 
 const notificationOptionsLabelMap = {
 	all: 'All_messages',
@@ -79,7 +80,7 @@ const PreferencesNotificationsSection = () => {
 		return options;
 	}, [t, userEmailNotificationMode]);
 
-	const { control } = useFormContext();
+	const { control } = useFormContext<AccountPreferencesData>();
 
 	const notificationRequireId = useUniqueId();
 	const desktopNotificationsId = useUniqueId();

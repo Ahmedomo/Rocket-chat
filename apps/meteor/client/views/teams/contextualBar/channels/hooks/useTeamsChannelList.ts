@@ -31,7 +31,7 @@ export const useTeamsChannelList = (
 	}, [options, reload]);
 
 	const fetchData = useCallback(
-		async (start, end) => {
+		async (start: number, end: number) => {
 			const { rooms, total } = await apiEndPoint({
 				teamId: options.teamId,
 				offset: start,

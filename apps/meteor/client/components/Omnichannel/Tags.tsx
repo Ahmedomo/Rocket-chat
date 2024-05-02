@@ -1,5 +1,5 @@
 import { TextInput, Chip, Button, FieldLabel, FieldRow } from '@rocket.chat/fuselage';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import { useToastMessageDispatch, useTranslation } from '@rocket.chat/ui-contexts';
 import type { ChangeEvent, ReactElement } from 'react';
 import React, { useMemo, useState } from 'react';
@@ -40,7 +40,7 @@ const Tags = ({ tags = [], handler, error, tagRequired, department }: TagsProps)
 		handler(tags.filter((tag) => tag !== tagToRemove));
 	};
 
-	const handleTagTextSubmit = useMutableCallback(() => {
+	const handleTagTextSubmit = useEffectEvent(() => {
 		if (!tags) {
 			return;
 		}

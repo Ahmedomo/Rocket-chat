@@ -1,4 +1,4 @@
-import type { IIncomingIntegration, Serialized } from '@rocket.chat/core-typings';
+import type { IIncomingIntegration, Serialized, IntegrationScriptEngine } from '@rocket.chat/core-typings';
 import type { SelectOption } from '@rocket.chat/fuselage';
 import {
 	FieldError,
@@ -26,6 +26,20 @@ import useClipboardWithToast from '../../../../hooks/useClipboardWithToast';
 import { useHighlightedCode } from '../../../../hooks/useHighlightedCode';
 import { useExampleData } from '../hooks/useExampleIncomingData';
 
+export type IncomingWebhookFormFields = {
+	enabled: boolean;
+	channel: string;
+	username: string;
+	name: string;
+	alias: string;
+	avatar: string;
+	emoji: string;
+	scriptEnabled: boolean;
+	scriptEngine: IntegrationScriptEngine;
+	overrideDestinationChannelEnabled: boolean;
+	script: string;
+};
+
 const IncomingWebhookForm = ({ webhookData }: { webhookData?: Serialized<IIncomingIntegration> }) => {
 	const t = useTranslation();
 	const absoluteUrl = useAbsoluteUrl();
@@ -34,7 +48,7 @@ const IncomingWebhookForm = ({ webhookData }: { webhookData?: Serialized<IIncomi
 		control,
 		watch,
 		formState: { errors },
-	} = useFormContext();
+	} = useFormContext<IncomingWebhookFormFields>();
 	const { alias, emoji, avatar } = watch();
 
 	const url = absoluteUrl(`hooks/${webhookData?._id}/${webhookData?.token}`);

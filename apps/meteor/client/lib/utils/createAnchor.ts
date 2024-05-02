@@ -1,18 +1,19 @@
 import { registerAnchor } from './deleteAnchor';
 
-type T = keyof HTMLElementTagNameMap;
-
-export const createAnchor: {
-	(id: string, tag?: T): T extends undefined ? HTMLElementTagNameMap['div'] : HTMLElementTagNameMap[T];
-} = (id: string, tag = 'div') => {
+export function createAnchor(id: string, tag?: undefined): HTMLDivElement;
+export function createAnchor<TTag extends keyof HTMLElementTagNameMap>(id: string, tag: TTag): HTMLElementTagNameMap[TTag];
+export function createAnchor(id: string, tag: keyof HTMLElementTagNameMap = 'div'): HTMLElement {
 	const anchor = document.getElementById(id);
 	if (anchor && anchor.tagName.toLowerCase() === tag) {
-		return anchor as any;
+		return anchor;
 	}
-	const a = document.createElement(tag);
-	a.id = id;
-	document.body.appendChild(a);
 
-	registerAnchor(a, () => document.body.removeChild(a));
-	return a;
-};
+	const element = document.createElement(tag);
+	element.id = id;
+	document.body.appendChild(element);
+
+	registerAnchor(element, () => {
+		document.body.removeChild(element);
+	});
+	return element;
+}

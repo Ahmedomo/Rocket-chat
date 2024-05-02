@@ -23,6 +23,14 @@ import { dispatchToastMessage } from '../../../lib/toast';
 import GenericModal from '../../GenericModal';
 import Tags from '../Tags';
 
+type CloseChatModalFields = {
+	comment: string;
+	tags: string[];
+	transcriptPDF: boolean;
+	transcriptEmail: boolean;
+	subject: string;
+};
+
 const CloseChatModal = ({
 	department,
 	visitorEmail,
@@ -49,7 +57,7 @@ const CloseChatModal = ({
 		setFocus,
 		setValue,
 		watch,
-	} = useForm();
+	} = useForm<CloseChatModalFields>();
 
 	const commentRequired = useSetting('Livechat_request_comment_when_closing_conversation') as boolean;
 	const [tagRequired, setTagRequired] = useState(false);
@@ -74,7 +82,7 @@ const CloseChatModal = ({
 	};
 
 	const onSubmit = useCallback(
-		({ comment, tags, transcriptPDF, transcriptEmail, subject }): void => {
+		({ comment, tags, transcriptPDF, transcriptEmail, subject }: CloseChatModalFields): void => {
 			const preferences = {
 				omnichannelTranscriptPDF: !!transcriptPDF,
 				omnichannelTranscriptEmail: !!transcriptEmail,

@@ -1,6 +1,7 @@
 import type { App, AppPermission } from '@rocket.chat/core-typings';
 import { useMutation } from '@tanstack/react-query';
 
+import type { Actions } from '../helpers';
 import { handleAPIError } from '../helpers/handleAPIError';
 import { warnAppInstall } from '../helpers/warnAppInstall';
 import { warnStatusChange } from '../helpers/warnStatusChange';
@@ -53,5 +54,7 @@ export const useMarketplaceActions = () => {
 		purchase: installAppMutation.mutateAsync,
 		install: installAppMutation.mutateAsync,
 		update: updateAppMutation.mutateAsync,
-	} as const;
+		request: () => undefined, // TODO: is it right?
+		subscribe: () => undefined, // TODO: is it right?
+	} as const satisfies Record<Actions, (...args: any) => void>;
 };

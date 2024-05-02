@@ -77,7 +77,7 @@ const TwoFactorTOTP = (props: ComponentProps<typeof Box>): ReactElement => {
 	}, [closeModal, disableTotpFn, dispatchToastMessage, setModal, t]);
 
 	const handleVerifyCode = useCallback(
-		async ({ authCode }) => {
+		async ({ authCode }: { authCode: string }) => {
 			try {
 				const result = await verifyCodeFn(authCode);
 

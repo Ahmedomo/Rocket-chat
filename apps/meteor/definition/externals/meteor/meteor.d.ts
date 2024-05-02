@@ -117,6 +117,11 @@ declare module 'meteor/meteor' {
 			) => ReturnType<TServerMethods[TMethodName]> | Promise<ReturnType<TServerMethods[TMethodName]>>;
 		}): void;
 
+		// function callAsync<TMethodName extends keyof ServerMethods>(
+		// 	methodName: TMethodName,
+		// 	...args: StringifyBuffers<Parameters<ServerMethods[TMethodName]>>
+		// ): Promise<ReturnType<ServerMethods[TMethodName]>>;
+
 		const AppCache:
 			| {
 					config: (config: { onlineOnly: string[] }) => void;

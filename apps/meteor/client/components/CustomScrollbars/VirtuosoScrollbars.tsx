@@ -1,13 +1,13 @@
-import type { ComponentProps, ReactElement, Ref } from 'react';
+import type { ComponentProps, ForwardedRef, PropsWithoutRef, ReactElement } from 'react';
 import React, { forwardRef } from 'react';
 
 import CustomScrollbars from './CustomScrollbars';
 
-type VirtuosoScrollbarsProps = ComponentProps<typeof CustomScrollbars>;
+type VirtuosoScrollbarsProps = PropsWithoutRef<ComponentProps<typeof CustomScrollbars>>;
 
 const VirtuosoScrollbars = forwardRef(function VirtuosoScrollbars(
 	{ style, children, ...props }: VirtuosoScrollbarsProps,
-	ref: Ref<HTMLDivElement>,
+	ref: ForwardedRef<HTMLDivElement>,
 ): ReactElement {
 	return (
 		<CustomScrollbars

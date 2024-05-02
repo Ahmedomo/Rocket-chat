@@ -54,7 +54,7 @@ const RoomInfo = ({ room, icon, onClickBack, onClickClose, onClickEnterRoom, onC
 				maxHeight='initial'
 				secondary
 				renderItem={({ label: { label, icon }, ...props }) => <Option {...props} label={label} icon={icon} />}
-				options={menuOptions}
+				options={menuOptions as any} // FIXME
 			/>
 		);
 	}, [menuOptions]);

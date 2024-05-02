@@ -10,6 +10,15 @@ import Tags from '../../../../../client/components/Omnichannel/Tags';
 import CannedResponsesComposer from './CannedResponsesComposer/CannedResponsesComposer';
 import CannedResponsesComposerPreview from './CannedResponsesComposer/CannedResponsesComposerPreview';
 
+export type CannedResponseFormFields = {
+	_id: string;
+	shortcut: string;
+	text: string;
+	tags: string[];
+	scope: string;
+	departmentId: string;
+};
+
 // TODO: refactor Tags field to get proper validation
 const CannedResponseForm = () => {
 	const t = useTranslation();
@@ -20,7 +29,7 @@ const CannedResponseForm = () => {
 		control,
 		formState: { errors },
 		watch,
-	} = useFormContext();
+	} = useFormContext<CannedResponseFormFields>();
 
 	const clickable = css`
 		cursor: pointer;

@@ -15,10 +15,10 @@ import { useOpenIncompatibleModal } from './useOpenIncompatibleModal';
 
 export type AppInstallationHandlerParams = {
 	app: App;
-	action: Actions | '';
+	action: Actions | undefined;
 	isAppPurchased?: boolean;
 	onDismiss: () => void;
-	onSuccess: (action: Actions | '', appPermissions?: App['permissions']) => void;
+	onSuccess: (action: Actions | undefined, appPermissions?: App['permissions']) => void;
 };
 
 export function useAppInstallationHandler({ app, action, isAppPurchased, onDismiss, onSuccess }: AppInstallationHandlerParams) {

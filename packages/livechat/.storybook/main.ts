@@ -1,5 +1,7 @@
-import { type StorybookConfig } from '@storybook/core-common';
-import { type RuleSetRule } from 'webpack';
+import * as path from 'node:path';
+
+import type { StorybookConfig } from '@storybook/core-common';
+import type { RuleSetRule } from 'webpack';
 
 const config: StorybookConfig = {
 	stories: ['../src/**/{*.story,story,*.stories,stories}.{js,tsx}'],
@@ -14,7 +16,7 @@ const config: StorybookConfig = {
 		'storybook-dark-mode',
 	],
 	core: {
-		builder: 'webpack4',
+		builder: 'webpack5',
 	},
 	webpackFinal: async (config) => {
 		if (!config.resolve || !config.module) {
@@ -27,34 +29,24 @@ const config: StorybookConfig = {
 			'react-dom/test-utils': 'preact/test-utils',
 			'react-dom': 'preact/compat',
 			'react/jsx-runtime': 'preact/jsx-runtime',
-			[require.resolve('../src/lib/uiKit')]: require.resolve('./mocks/uiKit.ts'),
+			[path.resolve('./src/lib/uiKit.js')]: path.resolve('./.storybook/mocks/uiKit.ts'),
 		};
 
-		const isRuleSetRule = (rule: any): rule is RuleSetRule => typeof rule === 'object' && rule.test && rule.use;
+		const isRuleSetRule = (rule: any): rule is RuleSetRule => typeof rule === 'object';
 
 		config.module.rules ??= [];
 
-		config.module.rules = config.module.rules.filter(
-			(rule) => isRuleSetRule(rule) && (typeof rule.loader !== 'string' || !/json-loader/.test(rule.loader)),
-		);
+		config.module.rules = config.module.rules.map((rule) => {
+			if (
+				isRuleSetRule(rule) &&
+				String(rule.test) === '/\\.(svg|ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf)(\\?.*)?$/'
+			) {
+				rule.test = /\.(ico|jpg|jpeg|png|apng|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf|mp3|mp4)(\?.*)?$/;
+			}
+			return rule;
+		});
 
-		const fileLoader = config.module.rules.find(
-			(rule): rule is RuleSetRule => isRuleSetRule(rule) && typeof rule.loader === 'string' && /file-loader/.test(rule.loader),
-		);
-		if (!fileLoader) {
-			throw new Error('Invalid webpack config');
-		}
-		fileLoader.test = /\.(ico|jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|cur|ani|pdf|mp3|mp4)(\?.*)?$/;
-
-		const urlLoader = config.module.rules
-			?.filter(isRuleSetRule)
-			.find(({ loader }) => typeof loader === 'string' && /url-loader/.test(loader));
-		if (!urlLoader) {
-			throw new Error('Invalid webpack config');
-		}
-		urlLoader.test = /\.(webm|wav|m4a|aac|oga)(\?.*)?$/;
-
-		config.module.rules.push({
+		config.module.rules.unshift({
 			test: /\.scss$/,
 			use: [
 				'style-loader',
@@ -70,14 +62,12 @@ const config: StorybookConfig = {
 			],
 		});
 
-		// eslint-disable-next-line @typescript-eslint/no-var-requires
-		const path = require('path');
-
 		const logoPath = path.resolve(path.join(__dirname, './logo.svg'));
 
 		config.module.rules.push({
-			...fileLoader,
 			test: (srcPath) => srcPath === logoPath,
+			type: 'asset/resource',
+			generator: { filename: 'static/media/[path][name][ext]' },
 		});
 
 		config.module.rules.push({

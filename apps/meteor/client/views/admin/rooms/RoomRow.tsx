@@ -41,7 +41,7 @@ const RoomRow = ({ room }: { room: Pick<IRoom, RoomAdminFieldsType> }) => {
 	};
 
 	const onClick = useCallback(
-		(rid) => (): void =>
+		(rid: IRoom['_id']) => (): void =>
 			router.navigate({
 				name: 'admin-rooms',
 				params: {

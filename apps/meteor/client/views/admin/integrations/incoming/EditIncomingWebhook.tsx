@@ -1,4 +1,4 @@
-import type { IIncomingIntegration, Serialized } from '@rocket.chat/core-typings';
+import type { IIncomingIntegration, IntegrationScriptEngine, Serialized } from '@rocket.chat/core-typings';
 import { Button, ButtonGroup, Tabs, TabsItem } from '@rocket.chat/fuselage';
 import { useUniqueId } from '@rocket.chat/fuselage-hooks';
 import { useSetModal, useTranslation, useRouter, useRouteParameter } from '@rocket.chat/ui-contexts';
@@ -10,6 +10,7 @@ import { Page, PageHeader, PageScrollableContentWithShadow, PageFooter } from '.
 import { useCreateIntegration } from '../hooks/useCreateIntegration';
 import { useDeleteIntegration } from '../hooks/useDeleteIntegration';
 import { useUpdateIntegration } from '../hooks/useUpdateIntegration';
+import type { IncomingWebhookFormFields } from './IncomingWebhookForm';
 import IncomingWebhookForm from './IncomingWebhookForm';
 
 const getInitialValue = (webhookData: Serialized<IIncomingIntegration> | undefined) => ({
@@ -38,13 +39,13 @@ const EditIncomingWebhook = ({ webhookData }: { webhookData?: Serialized<IIncomi
 	const updateIntegration = useUpdateIntegration(INCOMING_TYPE);
 	const createIntegration = useCreateIntegration(INCOMING_TYPE);
 
-	const methods = useForm({ mode: 'onBlur', values: getInitialValue(webhookData) });
+	const form = useForm<IncomingWebhookFormFields>({ mode: 'onBlur', values: getInitialValue(webhookData) });
 
 	const {
 		reset,
 		handleSubmit,
 		formState: { isDirty },
-	} = methods;
+	} = form;
 
 	const handleDeleteIntegration = useCallback(() => {
 		const onDelete = async () => {
@@ -63,7 +64,19 @@ const EditIncomingWebhook = ({ webhookData }: { webhookData?: Serialized<IIncomi
 	}, [webhookData?._id, deleteIntegration, setModal, t]);
 
 	const handleSave = useCallback(
-		async (formValues) => {
+		async (formValues: {
+			enabled: boolean;
+			channel: string;
+			username: string;
+			name: string;
+			alias: string;
+			avatar: string;
+			emoji: string;
+			scriptEnabled: boolean;
+			scriptEngine: IntegrationScriptEngine;
+			overrideDestinationChannelEnabled: boolean;
+			script: string;
+		}) => {
 			if (webhookData?._id) {
 				return updateIntegration.mutate({ integrationId: webhookData?._id, type: INCOMING_TYPE, ...formValues });
 			}
@@ -97,7 +110,7 @@ const EditIncomingWebhook = ({ webhookData }: { webhookData?: Serialized<IIncomi
 				</Tabs>
 			)}
 			<PageScrollableContentWithShadow id={formId} is='form' onSubmit={handleSubmit(handleSave)}>
-				<FormProvider {...methods}>
+				<FormProvider {...form}>
 					<IncomingWebhookForm webhookData={webhookData} />
 				</FormProvider>
 			</PageScrollableContentWithShadow>

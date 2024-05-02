@@ -15,19 +15,19 @@ import { ContactManager as ContactManagerForm } from '../../../additionalForms';
 import { FormSkeleton } from '../../components/FormSkeleton';
 import { useCustomFieldsMetadata } from '../../hooks/useCustomFieldsMetadata';
 
-type ContactNewEditProps = {
-	id: string;
-	data?: { contact: Serialized<ILivechatVisitor> | null };
-	close(): void;
-};
-
-type ContactFormData = {
+type ContactNewEditFields = {
 	token: string;
 	name: string;
 	email: string;
 	phone: string;
 	username: string;
 	customFields: Record<any, any>;
+};
+
+type ContactNewEditProps = {
+	id: string;
+	data?: { contact: Serialized<ILivechatVisitor> | null };
+	close(): void;
 };
 
 const DEFAULT_VALUES = {
@@ -39,7 +39,7 @@ const DEFAULT_VALUES = {
 	customFields: {},
 };
 
-const getInitialValues = (data: ContactNewEditProps['data']): ContactFormData => {
+const getInitialValues = (data: ContactNewEditProps['data']): ContactNewEditFields => {
 	if (!data) {
 		return DEFAULT_VALUES;
 	}
@@ -84,7 +84,7 @@ const ContactNewEdit = ({ id, data, close }: ContactNewEditProps): ReactElement 
 		setValue,
 		handleSubmit,
 		setError,
-	} = useForm<ContactFormData>({
+	} = useForm<ContactNewEditFields>({
 		mode: 'onChange',
 		reValidateMode: 'onChange',
 		defaultValues: initialValue,
@@ -146,7 +146,7 @@ const ContactNewEdit = ({ id, data, close }: ContactNewEditProps): ReactElement 
 		return isEmailValid && isPhoneValid;
 	};
 
-	const handleSave = async (data: ContactFormData): Promise<void> => {
+	const handleSave = async (data: ContactNewEditFields): Promise<void> => {
 		if (!(await validateAsync(data))) {
 			return;
 		}

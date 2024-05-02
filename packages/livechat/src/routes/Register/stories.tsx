@@ -1,4 +1,4 @@
-import type { Meta, Story } from '@storybook/preact';
+import type { Meta, Story } from '@storybook/react';
 import type { ComponentProps } from 'preact';
 
 import Register from '.';

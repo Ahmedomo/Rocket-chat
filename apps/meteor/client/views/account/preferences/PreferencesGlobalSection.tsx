@@ -5,13 +5,15 @@ import { useUserPreference, useTranslation } from '@rocket.chat/ui-contexts';
 import React from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesGlobalSection = () => {
 	const t = useTranslation();
 
 	const userDontAskAgainList = useUserPreference<{ action: string; label: string }[]>('dontAskAgainList') || [];
 	const options: SelectOption[] = userDontAskAgainList.map(({ action, label }) => [action, label]);
 
-	const { control } = useFormContext();
+	const { control } = useFormContext<AccountPreferencesData>();
 	const dontAskAgainListId = useUniqueId();
 
 	return (

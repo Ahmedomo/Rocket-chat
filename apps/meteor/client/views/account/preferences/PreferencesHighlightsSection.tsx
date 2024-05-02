@@ -4,9 +4,11 @@ import { useTranslation } from '@rocket.chat/ui-contexts';
 import React from 'react';
 import { useFormContext } from 'react-hook-form';
 
+import type { AccountPreferencesData } from './useAccountPreferencesValues';
+
 const PreferencesHighlightsSection = () => {
 	const t = useTranslation();
-	const { register } = useFormContext();
+	const { register } = useFormContext<AccountPreferencesData>();
 
 	const highlightsId = useUniqueId();
 

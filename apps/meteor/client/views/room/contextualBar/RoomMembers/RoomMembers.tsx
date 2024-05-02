@@ -3,7 +3,7 @@ import type { SelectOption } from '@rocket.chat/fuselage';
 import { Box, Icon, TextInput, Select, Throbber, ButtonGroup, Button, Callout } from '@rocket.chat/fuselage';
 import { useAutoFocus, useDebouncedCallback } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useSetting } from '@rocket.chat/ui-contexts';
-import type { ReactElement, FormEventHandler, ComponentProps, MouseEvent } from 'react';
+import type { ReactElement, FormEventHandler, ComponentProps, MouseEvent, ComponentType } from 'react';
 import React, { useMemo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
 
@@ -29,7 +29,7 @@ type RoomMembersProps = {
 	loading: boolean;
 	text: string;
 	type: string;
-	setText: FormEventHandler<HTMLElement>;
+	setText: FormEventHandler<HTMLInputElement>;
 	setType: (type: 'online' | 'all') => void;
 	members: RoomMemberUser[];
 	total: number;
@@ -39,7 +39,7 @@ type RoomMembersProps = {
 	onClickAdd?: () => void;
 	onClickInvite?: () => void;
 	loadMoreItems: () => void;
-	renderRow?: (props: ComponentProps<typeof RoomMembersRow>) => ReactElement | null;
+	renderRow?: ComponentType<ComponentProps<typeof RoomMembersRow>>;
 	reload: () => void;
 };
 
@@ -137,8 +137,11 @@ const RoomMembers = ({
 								totalCount={total}
 								overscan={50}
 								data={members}
-								// eslint-disable-next-line react/no-multi-comp
-								components={{ Scroller: VirtuosoScrollbars, Footer: () => <InfiniteListAnchor loadMore={loadMoreMembers} /> }}
+								components={{
+									Scroller: VirtuosoScrollbars,
+									// eslint-disable-next-line react/no-multi-comp
+									Footer: () => <InfiniteListAnchor loadMore={loadMoreMembers} />,
+								}}
 								itemContent={(index, data): ReactElement => (
 									<RowComponent useRealName={useRealName} data={itemData} user={data} index={index} reload={reload} />
 								)}

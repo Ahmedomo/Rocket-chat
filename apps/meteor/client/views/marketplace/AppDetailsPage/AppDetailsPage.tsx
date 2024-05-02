@@ -1,9 +1,8 @@
 import type { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 import type { App } from '@rocket.chat/core-typings';
 import { Button, ButtonGroup, Box } from '@rocket.chat/fuselage';
-import { useMutableCallback } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent } from '@rocket.chat/fuselage-hooks';
 import { useTranslation, useRouteParameter, useToastMessageDispatch, usePermission, useRouter } from '@rocket.chat/ui-contexts';
-import type { ReactElement } from 'react';
 import React, { useMemo, useCallback } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 
@@ -21,7 +20,9 @@ import AppRequests from './tabs/AppRequests/AppRequests';
 import AppSecurity from './tabs/AppSecurity/AppSecurity';
 import AppSettings from './tabs/AppSettings';
 
-const AppDetailsPage = ({ id }: { id: App['id'] }): ReactElement => {
+type AppDetailsPageFields = Record<string, unknown>;
+
+const AppDetailsPage = ({ id }: { id: App['id'] }) => {
 	const t = useTranslation();
 	const router = useRouter();
 	const dispatchToastMessage = useToastMessageDispatch();
@@ -31,7 +32,7 @@ const AppDetailsPage = ({ id }: { id: App['id'] }): ReactElement => {
 	const context = useRouteParameter('context');
 	const appData = useAppInfo(id, context || '');
 
-	const handleReturn = useMutableCallback((): void => {
+	const handleReturn = useEffectEvent(() => {
 		if (!context) {
 			return;
 		}
@@ -46,7 +47,7 @@ const AppDetailsPage = ({ id }: { id: App['id'] }): ReactElement => {
 	const isSecurityVisible = Boolean(privacyPolicySummary || permissions || tosLink || privacyLink);
 
 	const saveAppSettings = useCallback(
-		async (data) => {
+		async (data: AppDetailsPageFields) => {
 			try {
 				await AppClientOrchestratorInstance.setAppSettings(
 					id,
@@ -68,7 +69,7 @@ const AppDetailsPage = ({ id }: { id: App['id'] }): ReactElement => {
 		return Object.values(settings || {}).reduce((ret, { id, value, packageValue }) => ({ ...ret, [id]: value ?? packageValue }), {});
 	}, [settings]);
 
-	const methods = useForm({ values: reducedSettings });
+	const methods = useForm<AppDetailsPageFields>({ values: reducedSettings });
 	const {
 		handleSubmit,
 		reset,

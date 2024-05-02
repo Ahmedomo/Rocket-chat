@@ -13,12 +13,13 @@ import {
 	ToggleSwitch,
 	Box,
 } from '@rocket.chat/fuselage';
-import { useMutableCallback, useUniqueId } from '@rocket.chat/fuselage-hooks';
+import { useEffectEvent, useUniqueId } from '@rocket.chat/fuselage-hooks';
 import { useToastMessageDispatch, useMethod, useTranslation, useRouter } from '@rocket.chat/ui-contexts';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useMemo } from 'react';
 import { FormProvider, useForm, Controller } from 'react-hook-form';
 
+import type { CustomFieldsAdditionalFormFields } from '../../../../ee/client/omnichannel/additionalForms/CustomFieldsAdditionalForm';
 import {
 	Contextualbar,
 	ContextualbarTitle,
@@ -30,7 +31,7 @@ import {
 import { CustomFieldsAdditionalForm } from '../additionalForms';
 import { useRemoveCustomField } from './useRemoveCustomField';
 
-const getInitialValues = (customFieldData: Serialized<ILivechatCustomField> | undefined) => ({
+const getInitialValues = (customFieldData: Serialized<ILivechatCustomField> | undefined): CustomFieldsAdditionalFormFields => ({
 	field: customFieldData?._id || '',
 	label: customFieldData?.label || '',
 	scope: customFieldData?.scope || 'visitor',
@@ -53,16 +54,16 @@ const EditCustomFields = ({ customFieldData }: { customFieldData?: Serialized<IL
 
 	const handleDelete = useRemoveCustomField();
 
-	const methods = useForm({ mode: 'onBlur', values: getInitialValues(customFieldData) });
+	const form = useForm<CustomFieldsAdditionalFormFields>({ mode: 'onBlur', values: getInitialValues(customFieldData) });
 	const {
 		control,
 		handleSubmit,
 		formState: { isDirty, errors },
-	} = methods;
+	} = form;
 
 	const saveCustomField = useMethod('livechat:saveCustomField');
 
-	const handleSave = useMutableCallback(async ({ visibility, ...data }) => {
+	const handleSave = useEffectEvent(async ({ visibility, ...data }) => {
 		try {
 			await saveCustomField(customFieldData?._id as unknown as string, {
 				visibility: visibility ? 'visible' : 'hidden',
@@ -100,7 +101,7 @@ const EditCustomFields = ({ customFieldData }: { customFieldData?: Serialized<IL
 				<ContextualbarClose onClick={() => router.navigate('/omnichannel/customfields')} />
 			</ContextualbarHeader>
 			<ContextualbarScrollableContent>
-				<FormProvider {...methods}>
+				<FormProvider {...form}>
 					<form id={formId} onSubmit={handleSubmit(handleSave)}>
 						<FieldGroup>
 							<Field>

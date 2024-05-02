@@ -29,7 +29,7 @@ const getAppState = (
 });
 
 type AppsProviderProps = {
-	children: ReactNode;
+	children?: ReactNode;
 };
 
 const AppsProvider = ({ children }: AppsProviderProps) => {

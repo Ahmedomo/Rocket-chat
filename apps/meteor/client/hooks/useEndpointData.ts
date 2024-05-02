@@ -18,10 +18,10 @@ const deprecationWarning = log('useEndpointData is deprecated, use @tanstack/rea
  * use @tanstack/react-query with useEndpoint instead
  * @deprecated
  */
-export const useEndpointData = <TPathPattern extends PathPattern>(
+export const useEndpointData = <TPathPattern extends PathPattern, TKeys extends UrlParams<TPathPattern>>(
 	endpoint: TPathPattern,
 	options: {
-		keys?: UrlParams<TPathPattern>;
+		keys?: TKeys;
 		params?: OperationParams<'GET', TPathPattern>;
 		initialValue?: Serialized<OperationResult<'GET', TPathPattern>> | (() => Serialized<OperationResult<'GET', TPathPattern>>);
 	} = {},
