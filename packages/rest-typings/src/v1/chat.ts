@@ -267,19 +267,24 @@ const ChatGetThreadsListSchema = {
 		},
 		type: {
 			type: 'string',
-			nullable: true,
 		},
 		text: {
 			type: 'string',
-			nullable: true,
 		},
 		offset: {
 			type: 'number',
-			nullable: true,
 		},
 		count: {
 			type: 'number',
-			nullable: true,
+		},
+		sort: {
+			type: 'string',
+		},
+		fields: {
+			type: 'string',
+		},
+		query: {
+			type: 'string',
 		},
 	},
 	required: ['rid'],
@@ -326,7 +331,6 @@ const ChatDeleteSchema = {
 		},
 		asUser: {
 			type: 'boolean',
-			nullable: true,
 		},
 	},
 	required: ['msgId', 'roomId'],
@@ -463,7 +467,6 @@ const ChatUpdateSchema = {
 			items: {
 				type: 'string',
 			},
-			nullable: true,
 		},
 		customFields: {
 			type: 'object',

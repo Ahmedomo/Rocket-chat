@@ -14,7 +14,6 @@ import {
 } from '@rocket.chat/rest-typings';
 import { escapeHTML } from '@rocket.chat/string-helpers';
 import EJSON from 'ejson';
-import { check } from 'meteor/check';
 import { DDPRateLimiter } from 'meteor/ddp-rate-limiter';
 import { Meteor } from 'meteor/meteor';
 import { v4 as uuidv4 } from 'uuid';
@@ -416,12 +415,6 @@ API.v1.addRoute(
 	},
 	{
 		async get() {
-			check(
-				this.queryParams,
-				Match.ObjectIncluding({
-					token: String,
-				}),
-			);
 			const { token } = this.queryParams;
 
 			const user = await Users.findOneByResetToken(token, { projection: { _id: 1 } });
@@ -525,10 +518,6 @@ API.v1.addRoute(
 	},
 	{
 		async post() {
-			check(this.bodyParams, {
-				message: String,
-			});
-
 			const data = EJSON.parse(this.bodyParams.message);
 
 			if (!isMethodCallProps(data)) {
@@ -585,10 +574,6 @@ API.v1.addRoute(
 	},
 	{
 		async post() {
-			check(this.bodyParams, {
-				message: String,
-			});
-
 			const data = EJSON.parse(this.bodyParams.message);
 
 			if (!isMethodCallAnonProps(data)) {
@@ -683,10 +668,6 @@ API.v1.addRoute(
 	},
 	{
 		async post() {
-			check(this.bodyParams, {
-				setDeploymentAs: String,
-			});
-
 			if (this.bodyParams.setDeploymentAs === 'new-workspace') {
 				await Promise.all([
 					Settings.resetValueById('uniqueID', process.env.DEPLOYMENT_ID || uuidv4()),
