@@ -1,7 +1,7 @@
 import QueryString from 'querystring';
 import URL from 'url';
 
-import type { IE2EEMessage, IMessage, IRoom, ISubscription } from '@rocket.chat/core-typings';
+import type { IE2EEMessage, IMessage, IRoom, ISubscription, MessageAttachment } from '@rocket.chat/core-typings';
 import { isE2EEMessage, isFileAttachment } from '@rocket.chat/core-typings';
 import { Emitter } from '@rocket.chat/emitter';
 import EJSON from 'ejson';
@@ -40,6 +40,7 @@ import {
 } from './helper';
 import { log, logError } from './logger';
 import { E2ERoom } from './rocketchat.e2e.room';
+
 import './events.js';
 
 let failedToDecodeKey = false;
@@ -407,6 +408,30 @@ class E2E extends Emitter {
 		} catch (error) {
 			throw new Error('E2E -> Error decrypting private key');
 		}
+	}
+
+	async decryptPinnedMessage(message: IMessage) {
+		if (!message?.attachments || !message.attachments[0]?.text || message.attachments[0]?.t !== 'e2e') {
+			return message;
+		}
+
+		const e2eRoom = await this.getInstanceByRoomId(message.rid);
+		const pinnedMessage = message.attachments[0]?.text;
+
+		if (!e2eRoom || !pinnedMessage) {
+			return message;
+		}
+
+		const data = await e2eRoom.decrypt(pinnedMessage);
+
+		if (!data) {
+			return message;
+		}
+
+		const decryptedPinnedMessage = { ...message } as IMessage & { attachments: MessageAttachment[] };
+		decryptedPinnedMessage.attachments[0].text = data.text;
+
+		return decryptedPinnedMessage;
 	}
 
 	async decryptMessage(message: IMessage | IE2EEMessage): Promise<IMessage> {

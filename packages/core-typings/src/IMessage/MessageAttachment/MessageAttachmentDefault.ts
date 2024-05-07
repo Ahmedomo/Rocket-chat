@@ -27,4 +27,6 @@ export type MessageAttachmentDefault = {
 	thumb_url?: string;
 
 	color?: string;
+
+	t?: 'e2e';
 } & MessageAttachmentBase;
