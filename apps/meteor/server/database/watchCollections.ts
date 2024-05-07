@@ -42,7 +42,6 @@ export function getWatchCollections(): string[] {
 		IntegrationHistory.getCollectionName(),
 		Integrations.getCollectionName(),
 		EmailInbox.getCollectionName(),
-		PbxEvents.getCollectionName(),
 		Settings.getCollectionName(),
 		LivechatPriority.getCollectionName(),
 	];
@@ -50,6 +49,7 @@ export function getWatchCollections(): string[] {
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(PbxEvents.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {
