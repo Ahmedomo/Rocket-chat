@@ -12,6 +12,7 @@ import { beforeCreateRoomCallback } from '../../../../lib/callbacks/beforeCreate
 import { getSubscriptionAutotranslateDefaultConfig } from '../../../../server/lib/getSubscriptionAutotranslateDefaultConfig';
 import { getDefaultSubscriptionPref } from '../../../utils/lib/getDefaultSubscriptionPref';
 import { getValidRoomName } from '../../../utils/server/lib/getValidRoomName';
+import { notifyListenerOnRoomChanges } from '../lib/notifyListenerOnRoomChanges';
 import { createDirectRoom } from './createDirectRoom';
 
 const isValidName = (name: unknown): name is string => {
@@ -117,6 +118,7 @@ export const createRoom = async <T extends RoomType>(
 	}
 > => {
 	const { teamId, ...extraData } = roomExtraData || ({} as IRoom);
+
 	await beforeCreateRoomCallback.run({
 		type,
 		// name,
@@ -124,11 +126,13 @@ export const createRoom = async <T extends RoomType>(
 		// members,
 		// readOnly,
 		extraData,
-
 		// options,
 	});
+
 	if (type === 'd') {
-		return createDirectRoom(members as IUser[], extraData, { ...options, creator: options?.creator || owner?.username });
+		const room = await createDirectRoom(members as IUser[], extraData, { ...options, creator: options?.creator || owner?.username });
+		void notifyListenerOnRoomChanges(room.rid, 'inserted', room);
+		return room;
 	}
 
 	if (!onlyUsernames(members)) {
@@ -225,6 +229,8 @@ export const createRoom = async <T extends RoomType>(
 	}
 
 	const room = await Rooms.createWithFullRoomData(roomProps);
+
+	void notifyListenerOnRoomChanges(room._id, 'inserted', room);
 
 	const shouldBeHandledByFederation = room.federated === true || owner.username.includes(':');
 

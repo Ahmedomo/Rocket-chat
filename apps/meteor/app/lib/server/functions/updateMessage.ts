@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor';
 import { callbacks } from '../../../../lib/callbacks';
 import { broadcastMessageFromData } from '../../../../server/modules/watchers/lib/messages';
 import { settings } from '../../../settings/server';
+import { notifyListenerOnRoomChanges } from '../lib/notifyListenerOnRoomChanges';
 import { validateCustomMessageFields } from '../lib/validateCustomMessageFields';
 import { parseUrlsInMessage } from './parseUrlsInMessage';
 
@@ -99,6 +100,8 @@ export const updateMessage = async function (
 				id: msg._id,
 				data: msg,
 			});
+
+			void notifyListenerOnRoomChanges(message.rid);
 		}
 	});
 };

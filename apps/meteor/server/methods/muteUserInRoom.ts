@@ -7,6 +7,7 @@ import { Meteor } from 'meteor/meteor';
 
 import { hasPermissionAsync } from '../../app/authorization/server/functions/hasPermission';
 import { methodDeprecationLogger } from '../../app/lib/server/lib/deprecationWarningLogger';
+import { notifyListenerOnRoomChanges } from '../../app/lib/server/lib/notifyListenerOnRoomChanges';
 import { RoomMemberActions } from '../../definition/IRoomTypeConfig';
 import { callbacks } from '../../lib/callbacks';
 import { roomCoordinator } from '../lib/rooms/roomCoordinator';
@@ -75,6 +76,8 @@ export const muteUserInRoom = async (fromId: string, data: { rid: IRoom['_id']; 
 	await Message.saveSystemMessage('user-muted', data.rid, mutedUser.username, fromUser);
 
 	await callbacks.run('afterMuteUser', { mutedUser, fromUser }, room);
+
+	void notifyListenerOnRoomChanges(data.rid);
 
 	return true;
 };
