@@ -40,7 +40,6 @@ export function getWatchCollections(): string[] {
 		LoginServiceConfiguration.getCollectionName(),
 		InstanceStatus.getCollectionName(),
 		IntegrationHistory.getCollectionName(),
-		Integrations.getCollectionName(),
 		EmailInbox.getCollectionName(),
 		PbxEvents.getCollectionName(),
 		Settings.getCollectionName(),
@@ -50,6 +49,7 @@ export function getWatchCollections(): string[] {
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(Integrations.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {

@@ -19,6 +19,7 @@ import { callbacks } from '../../../../lib/callbacks';
 import { i18n } from '../../../../server/lib/i18n';
 import { FileUpload } from '../../../file-upload/server';
 import { settings } from '../../../settings/server';
+import { broadcastOnIntegrationChanges } from '../lib/notifyListener';
 import { getSubscribedRoomsForUserWithDetails, shouldRemoveOrChangeOwner } from './getRoomsWithSingleOwner';
 import { getUserSingleOwnedRooms } from './getUserSingleOwnedRooms';
 import { relinquishRoomOwnerships } from './relinquishRoomOwnerships';
@@ -111,6 +112,7 @@ export async function deleteUser(userId: string, confirmRelinquish = false, dele
 		}
 
 		await Integrations.disableByUserId(userId); // Disables all the integrations which rely on the user being deleted.
+		void broadcastOnIntegrationChanges(() => Integrations.find({ userId, enabled: { $ne: false } }).toArray());
 
 		// Don't broadcast user.deleted for Erasure Type of 'Keep' so that messages don't disappear from logged in sessions
 		if (messageErasureType === 'Delete') {
