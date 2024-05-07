@@ -44,12 +44,12 @@ export function getWatchCollections(): string[] {
 		EmailInbox.getCollectionName(),
 		PbxEvents.getCollectionName(),
 		Settings.getCollectionName(),
-		LivechatPriority.getCollectionName(),
 	];
 
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(LivechatPriority.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {
