@@ -34,7 +34,6 @@ export function getWatchCollections(): string[] {
 		Subscriptions.getCollectionName(),
 		LivechatInquiry.getCollectionName(),
 		LivechatDepartmentAgents.getCollectionName(),
-		Permissions.getCollectionName(),
 		Roles.getCollectionName(),
 		Rooms.getCollectionName(),
 		LoginServiceConfiguration.getCollectionName(),
@@ -50,6 +49,7 @@ export function getWatchCollections(): string[] {
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(Permissions.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {
