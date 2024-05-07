@@ -5,7 +5,6 @@ import { escapeRegExp, escapeHTML } from '@rocket.chat/string-helpers';
 import { Accounts } from 'meteor/accounts-base';
 import { Match } from 'meteor/check';
 import { Meteor } from 'meteor/meteor';
-import _ from 'underscore';
 
 import { callbacks } from '../../../../lib/callbacks';
 import { beforeCreateUserCallback } from '../../../../lib/callbacks/beforeCreateUserCallback';
@@ -166,7 +165,7 @@ const validateEmailDomain = (user) => {
 	}
 
 	let domainWhiteList = settings.get('Accounts_AllowedDomainsList');
-	if (_.isEmpty(domainWhiteList?.trim())) {
+	if (domainWhiteList?.trim().length === 0) {
 		return true;
 	}
 
@@ -464,7 +463,7 @@ Accounts.validateNewUser((user) => {
 	}
 
 	let domainWhiteList = settings.get('Accounts_AllowedDomainsList');
-	if (_.isEmpty(domainWhiteList?.trim())) {
+	if (domainWhiteList?.trim().length === 0) {
 		return true;
 	}
 
