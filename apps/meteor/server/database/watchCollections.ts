@@ -32,7 +32,6 @@ export function getWatchCollections(): string[] {
 	const collections = [
 		Users.getCollectionName(),
 		Subscriptions.getCollectionName(),
-		LivechatInquiry.getCollectionName(),
 		LivechatDepartmentAgents.getCollectionName(),
 		Permissions.getCollectionName(),
 		Roles.getCollectionName(),
@@ -50,6 +49,7 @@ export function getWatchCollections(): string[] {
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(LivechatInquiry.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {

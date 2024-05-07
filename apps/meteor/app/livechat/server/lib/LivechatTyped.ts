@@ -57,6 +57,10 @@ import { FileUpload } from '../../../file-upload/server';
 import { deleteMessage } from '../../../lib/server/functions/deleteMessage';
 import { sendMessage } from '../../../lib/server/functions/sendMessage';
 import { updateMessage } from '../../../lib/server/functions/updateMessage';
+import {
+	notifyListenerOnLivechatInquiryChangesByRoomId,
+	notifyListenerOnLivechatInquiryChangesByToken,
+} from '../../../lib/server/lib/notifyListenerOnLivechatInquiryChanges';
 import * as Mailer from '../../../mailer/server/api';
 import { metrics } from '../../../metrics/server';
 import { settings } from '../../../settings/server';
@@ -296,6 +300,7 @@ class LivechatClass {
 		if (removedInquiry && removedInquiry.deletedCount !== 1) {
 			throw new Error('Error removing inquiry');
 		}
+		void notifyListenerOnLivechatInquiryChangesByRoomId(rid, 'removed');
 
 		const updatedRoom = await LivechatRooms.closeRoomById(rid, closeData);
 		if (!updatedRoom || updatedRoom.modifiedCount !== 1) {
@@ -504,6 +509,8 @@ class LivechatClass {
 			LivechatInquiry.removeByRoomId(rid),
 			LivechatRooms.removeById(rid),
 		]);
+
+		void notifyListenerOnLivechatInquiryChangesByRoomId(rid, 'removed');
 
 		for (const r of result) {
 			if (r.status === 'rejected') {
@@ -1267,6 +1274,8 @@ class LivechatClass {
 			LivechatRooms.removeByVisitorToken(token),
 			LivechatInquiry.removeByVisitorToken(token),
 		]);
+
+		void notifyListenerOnLivechatInquiryChangesByToken(token);
 	}
 
 	async deleteMessage({ guest, message }: { guest: ILivechatVisitor; message: IMessage }) {
@@ -1655,8 +1664,13 @@ class LivechatClass {
 	}
 
 	async notifyGuestStatusChanged(token: string, status: UserStatus) {
-		await LivechatInquiry.updateVisitorStatus(token, status);
 		await LivechatRooms.updateVisitorStatus(token, status);
+
+		const inquiryVisitorStatus = await LivechatInquiry.updateVisitorStatus(token, status);
+
+		if (inquiryVisitorStatus.modifiedCount) {
+			void notifyListenerOnLivechatInquiryChangesByToken(token);
+		}
 	}
 
 	async setUserStatusLivechat(userId: string, status: ILivechatAgentStatus) {
@@ -1801,11 +1815,14 @@ class LivechatClass {
 		if (guestData?.name?.trim().length) {
 			const { _id: rid } = roomData;
 			const { name } = guestData;
+
 			await Promise.all([
 				Rooms.setFnameById(rid, name),
 				LivechatInquiry.setNameByRoomId(rid, name),
 				Subscriptions.updateDisplayNameByRoomId(rid, name),
 			]);
+
+			void notifyListenerOnLivechatInquiryChangesByRoomId(rid);
 
 			return true;
 		}
