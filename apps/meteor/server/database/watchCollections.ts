@@ -37,7 +37,6 @@ export function getWatchCollections(): string[] {
 		Permissions.getCollectionName(),
 		Roles.getCollectionName(),
 		Rooms.getCollectionName(),
-		LoginServiceConfiguration.getCollectionName(),
 		InstanceStatus.getCollectionName(),
 		IntegrationHistory.getCollectionName(),
 		Integrations.getCollectionName(),
@@ -50,6 +49,7 @@ export function getWatchCollections(): string[] {
 	// add back to the list of collections in case db watchers are enabled
 	if (!dbWatchersDisabled) {
 		collections.push(Messages.getCollectionName());
+		collections.push(LoginServiceConfiguration.getCollectionName());
 	}
 
 	if (onlyCollections.length > 0) {
