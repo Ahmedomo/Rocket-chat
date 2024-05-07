@@ -187,7 +187,12 @@ export const sendFileMessage = async (
 			tmid: Match.Optional(String),
 			customFields: Match.Optional(String),
 			t: Match.Optional(String),
-			e2e: Match.Optional(String),
+			content: Match.Optional(
+				Match.ObjectIncluding({
+					algorithm: String,
+					ciphertext: String,
+				}),
+			),
 		}),
 	);
 

@@ -1,4 +1,4 @@
-import type { IMessage, IRoom, IUser, RoomAdminFieldsType, IUpload } from '@rocket.chat/core-typings';
+import type { IMessage, IRoom, IUser, RoomAdminFieldsType, IUpload, IE2EEMessage } from '@rocket.chat/core-typings';
 import Ajv from 'ajv';
 
 import type { PaginatedRequest } from '../helpers/PaginatedRequest';
@@ -597,6 +597,25 @@ export type RoomsEndpoints = {
 			customFields?: string;
 			t?: IMessage['t'];
 			e2e?: IMessage['e2e'];
+		}) => { message: IMessage | null };
+	};
+
+	'/v1/rooms.media/:rid': {
+		POST: (params: { file: File }) => { file: { url: string } };
+	};
+
+	'/v1/rooms.mediaConfirm/:rid/:fileId': {
+		POST: (params: {
+			description?: string;
+			avatar?: string;
+			emoji?: string;
+			alias?: string;
+			groupable?: boolean;
+			msg?: string;
+			tmid?: string;
+			customFields?: string;
+			t?: IMessage['t'];
+			content?: IE2EEMessage['content'];
 		}) => { message: IMessage | null };
 	};
 

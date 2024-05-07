@@ -1,6 +1,5 @@
 import { Base64 } from '@rocket.chat/base64';
 import { Emitter } from '@rocket.chat/emitter';
-import { Random } from '@rocket.chat/random';
 import EJSON from 'ejson';
 
 import { RoomManager } from '../../../client/lib/RoomManager';
@@ -23,6 +22,8 @@ import {
 	importAESKey,
 	importRSAKey,
 	readFileAsArrayBuffer,
+	encryptAESCTR,
+	generateAESCTRKey,
 } from './helper';
 import { log, logError } from './logger';
 import { e2e } from './rocketchat.e2e';
@@ -333,69 +334,72 @@ export class E2ERoom extends Emitter {
 		}
 	}
 
+	async sha256Hash(text) {
+		const encoder = new TextEncoder();
+		const data = encoder.encode(text);
+		const hashArray = Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256', data)));
+		return hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
+	}
+
 	// Encrypts files before upload. I/O is in arraybuffers.
 	async encryptFile(file) {
-		if (!this.isSupportedRoomType(this.typeOfRoom)) {
-			return;
-		}
+		// if (!this.isSupportedRoomType(this.typeOfRoom)) {
+		// 	return;
+		// }
 
 		const fileArrayBuffer = await readFileAsArrayBuffer(file);
 
 		const vector = crypto.getRandomValues(new Uint8Array(16));
+		const key = await generateAESCTRKey();
 		let result;
 		try {
-			result = await encryptAES(vector, this.groupSessionKey, fileArrayBuffer);
+			result = await encryptAESCTR(vector, key, fileArrayBuffer);
 		} catch (error) {
+			console.log(error);
 			return this.error('Error encrypting group key: ', error);
 		}
 
-		const output = joinVectorAndEcryptedData(vector, result);
+		const exportedKey = await window.crypto.subtle.exportKey('jwk', key);
 
-		const encryptedFile = new File([toArrayBuffer(EJSON.stringify(output))], file.name);
+		const fileName = await this.sha256Hash(file.name);
 
-		return encryptedFile;
+		const encryptedFile = new File([toArrayBuffer(result)], fileName);
+
+		return {
+			file: encryptedFile,
+			key: exportedKey,
+			iv: Base64.encode(vector),
+			type: file.type,
+		};
 	}
 
 	// Decrypt uploaded encrypted files. I/O is in arraybuffers.
-	async decryptFile(message) {
-		if (message[0] !== '{') {
-			return;
-		}
+	async decryptFile(file, key, iv) {
+		const ivArray = Base64.decode(iv);
+		const cryptoKey = await window.crypto.subtle.importKey('jwk', key, { name: 'AES-CTR' }, true, ['encrypt', 'decrypt']);
 
-		const [vector, cipherText] = splitVectorAndEcryptedData(EJSON.parse(message));
-
-		try {
-			return await decryptAES(vector, this.groupSessionKey, cipherText);
-		} catch (error) {
-			this.error('Error decrypting file: ', error);
-
-			return false;
-		}
+		return window.crypto.subtle.decrypt({ name: 'AES-CTR', counter: ivArray, length: 64 }, cryptoKey, file);
 	}
 
 	// Encrypts messages
 	async encryptText(data) {
-		if (!(typeof data === 'function' || (typeof data === 'object' && !!data))) {
-			data = new TextEncoder('UTF-8').encode(EJSON.stringify({ text: data, ack: Random.id((Random.fraction() + 1) * 20) }));
-		}
-
-		if (!this.isSupportedRoomType(this.typeOfRoom)) {
-			return data;
-		}
-
 		const vector = crypto.getRandomValues(new Uint8Array(16));
-		let result;
-		try {
-			result = await encryptAES(vector, this.groupSessionKey, data);
-		} catch (error) {
-			return this.error('Error encrypting message: ', error);
-		}
 
-		return this.keyID + Base64.encode(joinVectorAndEcryptedData(vector, result));
+		try {
+			const result = await encryptAES(vector, this.groupSessionKey, data);
+			return this.keyID + Base64.encode(joinVectorAndEcryptedData(vector, result));
+		} catch (error) {
+			this.error('Error encrypting message: ', error);
+			throw error;
+		}
 	}
 
 	// Helper function for encryption of messages
 	encrypt(message) {
+		if (!this.isSupportedRoomType(this.typeOfRoom)) {
+			return;
+		}
+
 		const ts = new Date();
 
 		const data = new TextEncoder('UTF-8').encode(
@@ -407,20 +411,6 @@ export class E2ERoom extends Emitter {
 			}),
 		);
 
-		return this.encryptText(data);
-	}
-
-	encryptAttachmentDescription(description, _id) {
-		const ts = new Date();
-
-		const data = new TextEncoder('UTF-8').encode(
-			EJSON.stringify({
-				userId: this.userId,
-				text: description,
-				_id,
-				ts,
-			}),
-		);
 		return this.encryptText(data);
 	}
 
@@ -445,10 +435,6 @@ export class E2ERoom extends Emitter {
 	}
 
 	async decrypt(message) {
-		if (!this.isSupportedRoomType(this.typeOfRoom)) {
-			return message;
-		}
-
 		const keyID = message.slice(0, 12);
 
 		if (keyID !== this.keyID) {
