@@ -1,7 +1,7 @@
-import { Box } from '@rocket.chat/fuselage';
-import { useOutsideClick, useToggle } from '@rocket.chat/fuselage-hooks';
+import { Button } from '@rocket.chat/fuselage';
+import { useToggle } from '@rocket.chat/fuselage-hooks';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
-import type { Dispatch, FormEvent, ReactElement, RefObject, SetStateAction } from 'react';
+import type { ComponentProps, FormEvent, ReactElement, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
 
 import MultiSelectCustomAnchor from './MultiSelectCustomAnchor';
@@ -21,21 +21,11 @@ const onMouseEventPreventSideEffects = (e: MouseEvent): void => {
 	e.stopImmediatePropagation();
 };
 
-type TitleOptionProp = {
+export type OptionProp = {
 	id: string;
 	text: string;
-	isGroupTitle: boolean;
-	checked: never;
+	checked?: boolean;
 };
-
-type CheckboxOptionProp = {
-	id: string;
-	text: string;
-	isGroupTitle: never;
-	checked: boolean;
-};
-
-export type OptionProp = TitleOptionProp | CheckboxOptionProp;
 
 /**
  * @param dropdownOptions options available for the multiselect dropdown list
@@ -56,9 +46,9 @@ type DropDownProps = {
 	defaultTitle: TranslationKey;
 	selectedOptionsTitle: TranslationKey;
 	selectedOptions: OptionProp[];
-	setSelectedOptions: Dispatch<SetStateAction<OptionProp[]>>;
+	setSelectedOptions: (roles: OptionProp[]) => void;
 	searchBarText?: TranslationKey;
-};
+} & ComponentProps<typeof Button>;
 
 export const MultiSelectCustom = ({
 	dropdownOptions,
@@ -67,9 +57,9 @@ export const MultiSelectCustom = ({
 	selectedOptions,
 	setSelectedOptions,
 	searchBarText,
+	...props
 }: DropDownProps): ReactElement => {
 	const reference = useRef<HTMLInputElement>(null);
-	const target = useRef<HTMLElement>(null);
 	const [collapsed, toggleCollapsed] = useToggle(false);
 
 	const onClose = useCallback(
@@ -83,8 +73,6 @@ export const MultiSelectCustom = ({
 		},
 		[toggleCollapsed],
 	);
-
-	useOutsideClick([target], onClose);
 
 	const onSelect = (item: OptionProp, e?: FormEvent<HTMLElement>): void => {
 		e?.stopPropagation();
@@ -102,21 +90,21 @@ export const MultiSelectCustom = ({
 	const count = dropdownOptions.filter((option) => option.checked).length;
 
 	return (
-		<Box display='flex' flexGrow={1} position='relative'>
+		<>
 			<MultiSelectCustomAnchor
 				ref={reference}
 				onClick={toggleCollapsed as any}
-				collapsed={collapsed}
 				defaultTitle={defaultTitle}
 				selectedOptionsTitle={selectedOptionsTitle}
 				selectedOptionsCount={count}
 				maxCount={dropdownOptions.length}
+				{...props}
 			/>
 			{collapsed && (
-				<MultiSelectCustomListWrapper ref={target}>
+				<MultiSelectCustomListWrapper ref={reference} onClose={onClose}>
 					<MultiSelectCustomList options={dropdownOptions} onSelected={onSelect} searchBarText={searchBarText} />
 				</MultiSelectCustomListWrapper>
 			)}
-		</Box>
+		</>
 	);
 };

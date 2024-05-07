@@ -1,4 +1,3 @@
-import { css } from '@rocket.chat/css-in-js';
 import { Box, Button, Icon, Palette } from '@rocket.chat/fuselage';
 import type { TranslationKey } from '@rocket.chat/ui-contexts';
 import { useTranslation } from '@rocket.chat/ui-contexts';
@@ -7,7 +6,6 @@ import { forwardRef } from 'react';
 
 type MultiSelectCustomAnchorProps = {
 	onClick?: (value: boolean) => void;
-	collapsed: boolean;
 	defaultTitle: TranslationKey;
 	selectedOptionsTitle: TranslationKey;
 	selectedOptionsCount: number;
@@ -15,32 +13,16 @@ type MultiSelectCustomAnchorProps = {
 } & ComponentProps<typeof Button>;
 
 const MultiSelectCustomAnchor = forwardRef<HTMLElement, MultiSelectCustomAnchorProps>(function MultiSelectCustomAnchor(
-	{ onClick, collapsed, selectedOptionsCount, selectedOptionsTitle, defaultTitle, maxCount, ...props },
+	{ onClick, selectedOptionsCount, selectedOptionsTitle, defaultTitle, maxCount, ...props },
 	ref,
 ) {
 	const t = useTranslation();
-
-	const inputStyle = collapsed
-		? css`
-				&,
-				&:hover,
-				&:active,
-				&:focus {
-					cursor: pointer;
-					border-color: ${Palette.stroke['stroke-highlight'].toString()}!important;
-					box-shadow: 0 0 0 2px ${Palette.shadow['shadow-highlight'].toString()};
-				}
-		  `
-		: css`
-				& {
-					cursor: pointer;
-				}
-		  `;
 
 	const isDirty = selectedOptionsCount > 0 && selectedOptionsCount !== maxCount - 1;
 
 	return (
 		<Box
+			is='button'
 			ref={ref}
 			onClick={onClick}
 			display='flex'
@@ -56,7 +38,7 @@ const MultiSelectCustomAnchor = forwardRef<HTMLElement, MultiSelectCustomAnchorP
 			pb={10}
 			pi={16}
 			color={isDirty ? Palette.text['font-default'].toString() : Palette.text['font-annotation'].toString()}
-			className={inputStyle}
+			rcx-input-box
 			{...props}
 		>
 			{isDirty ? `${t(selectedOptionsTitle)} (${selectedOptionsCount})` : t(defaultTitle)}
