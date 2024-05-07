@@ -22,20 +22,23 @@ import TeamsChannelItemMenu from './TeamsChannelItemMenu';
 
 type TeamsChannelItemProps = {
 	room: IRoom;
+	mainRoomId: string;
 	onClickView: (room: IRoom) => void;
 	reload: () => void;
 };
 
-const TeamsChannelItem = ({ room, onClickView, reload }: TeamsChannelItemProps) => {
+const TeamsChannelItem = ({ room, mainRoomId, onClickView, reload }: TeamsChannelItemProps) => {
 	const t = useTranslation();
 	const rid = room._id;
 	const type = room.t;
 
 	const [showButton, setShowButton] = useState();
 
-	const canRemoveTeamChannel = usePermission('remove-team-channel', rid);
-	const canEditTeamChannel = usePermission('edit-team-channel', rid);
-	const canDeleteTeamChannel = usePermission(type === 'c' ? 'delete-c' : 'delete-p', rid);
+	const canRemoveTeamChannel = usePermission('remove-team-channel', mainRoomId);
+	const canEditTeamChannel = usePermission('edit-team-channel', mainRoomId);
+	const canDeleteChannel = usePermission(`delete-${type}`, rid);
+	const canDeleteTeamChannel = usePermission(`delete-team-${type === 'c' ? 'channel' : 'group'}`, mainRoomId);
+	const canDelete = canDeleteChannel && canDeleteTeamChannel;
 
 	const isReduceMotionEnabled = usePrefersReducedMotion();
 	const handleMenuEvent = {
@@ -66,9 +69,9 @@ const TeamsChannelItem = ({ room, onClickView, reload }: TeamsChannelItemProps) 
 					)}
 				</Box>
 			</OptionContent>
-			{(canRemoveTeamChannel || canEditTeamChannel || canDeleteTeamChannel) && (
+			{(canRemoveTeamChannel || canEditTeamChannel || canDelete) && (
 				<OptionMenu onClick={onClick}>
-					{showButton ? <TeamsChannelItemMenu room={room} reload={reload} /> : <IconButton tiny icon='kebab' />}
+					{showButton ? <TeamsChannelItemMenu room={room} mainRoomId={mainRoomId} reload={reload} /> : <IconButton tiny icon='kebab' />}
 				</OptionMenu>
 			)}
 		</Option>

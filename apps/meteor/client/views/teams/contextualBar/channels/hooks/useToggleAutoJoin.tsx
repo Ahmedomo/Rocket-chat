@@ -1,10 +1,10 @@
 import type { IRoom } from '@rocket.chat/core-typings';
 import { useEndpoint, usePermission, useToastMessageDispatch } from '@rocket.chat/ui-contexts';
 
-export const useToggleAutoJoin = (room: IRoom, { reload }: { reload?: () => void }) => {
+export const useToggleAutoJoin = (room: IRoom, mainRoomId: IRoom['_id'], { reload }: { reload?: () => void }) => {
 	const dispatchToastMessage = useToastMessageDispatch();
 	const updateRoomEndpoint = useEndpoint('POST', '/v1/teams.updateRoom');
-	const canEditTeamChannel = usePermission('edit-team-channel', room._id);
+	const canEditTeamChannel = usePermission('edit-team-channel', mainRoomId);
 
 	const handleToggleAutoJoin = async () => {
 		try {
