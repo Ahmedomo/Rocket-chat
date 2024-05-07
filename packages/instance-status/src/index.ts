@@ -11,6 +11,14 @@ const defaultPingInterval = parseInt(String(process.env.MULTIPLE_INSTANCES_PING_
 // if not set via env var ensures at least 3 ticks before expiring (multiple of 60s)
 const indexExpire = (parseInt(String(process.env.MULTIPLE_INSTANCES_EXPIRE)) || Math.ceil((defaultPingInterval * 3) / 60)) * 60;
 
+const dbWatchersDisabled = ['yes', 'true'].includes(String(process.env.DISABLE_DB_WATCHERS).toLowerCase());
+
+function broadcastEvent(clientAction: 'inserted' | 'updated' | 'removed', id: string, data?: any, diff?: any) {
+	if (dbWatchersDisabled) {
+		events.emit('watch.instanceStatus', { clientAction, id, data, diff });
+	}
+}
+
 let createIndexes = async () => {
 	await InstanceStatusModel.col
 		.indexes()
@@ -75,17 +83,19 @@ async function registerInstance(name: string, extraInformation: Record<string, u
 	};
 
 	try {
-		await InstanceStatusModel.updateOne({ _id: ID }, instance as any, { upsert: true });
+		const result = await InstanceStatusModel.updateOne({ _id: ID }, instance as any, { upsert: true });
 
-		const result = await InstanceStatusModel.findOne({ _id: ID });
+		const instanceStatus = await InstanceStatusModel.findOne({ _id: ID });
 
 		start();
 
-		events.emit('registerInstance', result, instance);
+		events.emit('registerInstance', instanceStatus, instance);
+
+		broadcastEvent(result.upsertedId ? 'inserted' : 'updated', ID, instanceStatus);
 
 		process.on('exit', onExit);
 
-		return result;
+		return instanceStatus;
 	} catch (e) {
 		return e;
 	}
@@ -97,6 +107,10 @@ async function unregisterInstance() {
 		stop();
 
 		events.emit('unregisterInstance', ID);
+
+		if (result.deletedCount) {
+			broadcastEvent('removed', ID);
+		}
 
 		process.removeListener('exit', onExit);
 
@@ -148,7 +162,7 @@ async function onExit() {
 }
 
 async function updateConnections(conns: number) {
-	await InstanceStatusModel.updateOne(
+	const result = await InstanceStatusModel.updateOne(
 		{
 			_id: ID,
 		},
@@ -158,6 +172,10 @@ async function updateConnections(conns: number) {
 			},
 		},
 	);
+
+	if (result.modifiedCount) {
+		broadcastEvent('updated', ID, undefined, { 'extraInformation.conns': conns });
+	}
 }
 
 export const InstanceStatus = {
