@@ -68,14 +68,14 @@ const swiperStyle = css`
 
 	.rcx-swiper-prev-button,
 	.swiper-rtl .rcx-swiper-next-button {
-		right: auto;
-		left: 10px;
+		left: auto;
+		right: 10px;
 	}
 
 	.rcx-swiper-next-button,
 	.swiper-rtl .rcx-swiper-prev-button {
-		right: 10px;
-		left: auto;
+		left: 10px;
+		right: auto;
 	}
 
 	.rcx-lazy-preloader {
@@ -154,11 +154,11 @@ export const ImageGallery = ({ images, onClose, loadMore }: { images: IUpload[];
 							onClick={onClose}
 						/>
 					</ButtonGroup>
-					<IconButton icon='chevron-right' aria-label={t('Next_image')} className='rcx-swiper-prev-button' onClick={preventPropagation} />
+					<IconButton icon='chevron-right' aria-label={t('Next_image')} className='rcx-swiper-next-button' onClick={preventPropagation} />
 					<IconButton
 						icon='chevron-left'
 						aria-label={t('Previous_image')}
-						className='rcx-swiper-next-button'
+						className='rcx-swiper-prev-button'
 						onClick={preventPropagation}
 					/>
 					<Swiper
